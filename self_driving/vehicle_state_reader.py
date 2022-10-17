@@ -47,22 +47,21 @@ class VehicleStateReader:
         return self.vehicle.get_bbox()
 
     def update_state(self):
-        sensors = self.beamng.poll_sensors(self.vehicle)
-        self.sensors = sensors
+        self.vehicle.poll_sensors()
 
-        st = sensors['state']
-        ele = sensors['electrics']
+        st = self.vehicle.sensors['state']
+        ele = self.vehicle.sensors['electrics']
         vel = tuple(st['vel'])
 
-        self.state = VehicleState(timer=sensors['timer']['time']
+        self.state = VehicleState(timer=self.vehicle.sensors['timer'].data['time']
                                   , pos=tuple(st['pos'])
                                   , dir=tuple(st['dir'])
                                   , vel=vel
-                                  , steering=ele.get('steering', None)
-                                  , steering_input=ele.get('steering_input', None)
-                                  , brake=ele.get('brake', None)
-                                  , brake_input=ele.get('brake_input', None)
-                                  , throttle=ele.get('throttle', None)
-                                  , throttle_input=ele.get('throttle_input', None)
-                                  , wheelspeed=ele.get('wheelspeed', None)
+                                  , steering=ele.data.get('steering', None)
+                                  , steering_input=ele.data.get('steering_input', None)
+                                  , brake=ele.data.get('brake', None)
+                                  , brake_input=ele.data.get('brake_input', None)
+                                  , throttle=ele.data.get('throttle', None)
+                                  , throttle_input=ele.data.get('throttle_input', None)
+                                  , wheelspeed=ele.data.get('wheelspeed', None)
                                   , vel_kmh=int(round(np.linalg.norm(vel) * 3.6)))

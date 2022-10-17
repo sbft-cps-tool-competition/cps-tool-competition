@@ -1,3 +1,5 @@
+import subprocess
+
 from code_pipeline.executors import AbstractTestExecutor
 
 import time
@@ -129,7 +131,7 @@ class BeamngExecutor(AbstractTestExecutor):
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
             # Note This changed since BeamNG.research
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.24', 'levels'))
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
@@ -203,7 +205,10 @@ class BeamngExecutor(AbstractTestExecutor):
             except:
                 pass
 
-            self.end_iteration()
+            # self.end_iteration()
+            # TODO: better to close the simulator than to reuse it, as with the new version of BeamngPy the simulator
+            #  gets stuck when the simulator restarts.
+            self._close()
 
         return sim_data_collector.simulation_data
 
@@ -217,7 +222,13 @@ class BeamngExecutor(AbstractTestExecutor):
     def _close(self):
         if self.brewer:
             try:
-                self.brewer.beamng.close()
+                self.brewer.beamng.scenario.close()
+
+                beamng_program_name = "BeamNG.tech.x64"
+                cmd = "taskkill /IM \"{}.exe\" /F".format(beamng_program_name)
+                ret = subprocess.check_output(cmd)
+
+                output_str = ret.decode("utf-8")
             except Exception as ex:
                 traceback.print_exception(type(ex), ex, ex.__traceback__)
             self.brewer = None

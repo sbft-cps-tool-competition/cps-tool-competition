@@ -70,7 +70,8 @@ class RoadPoints:
         v = (p2v / np.linalg.norm(p2v)) * meters_from_road_start
         origin = np.add(p1[0:2], p1r[0:2]) / 2
         deg = np.degrees(np.arctan2([-v[0]], [-v[1]]))
-        res = BeamNGPose(pos=tuple(origin + v) + (p1[2],), rot=(0, 0, deg[0]))
+        # FIXME: check
+        res = BeamNGPose(pos=tuple(origin + v) + (p1[2],), rot=(0, 0, deg[0], 1))
         return res
 
     def new_imagery(self):
