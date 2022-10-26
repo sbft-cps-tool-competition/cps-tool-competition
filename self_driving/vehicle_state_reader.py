@@ -12,7 +12,7 @@ VehicleState = namedtuple('VehicleState', VehicleStateProperties)
 
 
 class VehicleStateReader:
-    def __init__(self, vehicle: Vehicle, beamng: BeamNGpy, additional_sensors: List[Tuple[str, Sensor]] = None):
+    def __init__(self, vehicle: Vehicle, beamng: BeamNGpy):
         self.vehicle = vehicle
 
         self.beamng = beamng
@@ -29,16 +29,11 @@ class VehicleStateReader:
         except:
             pass
 
-
         electrics = Electrics()
         timer = Timer()
 
         self.vehicle.attach_sensor('electrics', electrics)
         self.vehicle.attach_sensor('timer', timer)
-
-        if additional_sensors:
-            for (name, sensor) in additional_sensors:
-                self.vehicle.attach_sensor(name, sensor)
 
     def get_state(self) -> VehicleState:
         return self.state

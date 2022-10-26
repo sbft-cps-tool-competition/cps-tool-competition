@@ -139,7 +139,7 @@ class BeamngExecutor(AbstractTestExecutor):
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=None)
+        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
 
         steps = brewer.params.beamng_steps

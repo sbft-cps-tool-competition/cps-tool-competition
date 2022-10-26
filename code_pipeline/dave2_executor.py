@@ -1,3 +1,6 @@
+import subprocess
+
+import numpy as np
 from tensorflow.python.keras.models import load_model
 
 from code_pipeline.executors import AbstractTestExecutor
@@ -21,7 +24,9 @@ from shapely.geometry import Point
 
 import logging as log
 import os.path
+
 FloatDTuple = Tuple[float, float, float, float]
+
 
 class Dave2Executor(AbstractTestExecutor):
 
@@ -30,8 +35,8 @@ class Dave2Executor(AbstractTestExecutor):
                  oob_tolerance=0.95, max_speed=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
         super(Dave2Executor, self).__init__(result_folder, map_size,
-                                             generation_budget=generation_budget, execution_budget=execution_budget,
-                                             time_budget=time_budget, debug=debug)
+                                            generation_budget=generation_budget, execution_budget=execution_budget,
+                                            time_budget=time_budget, debug=debug)
 
         # TODO Is this still valid?
         # self.test_time_budget = 250000
@@ -109,7 +114,8 @@ class Dave2Executor(AbstractTestExecutor):
             return True
 
         # If the car moved since the last observation, we store the last state and move one
-        if Point(self.last_observation.pos[0],self.last_observation.pos[1]).distance(Point(last_state.pos[0], last_state.pos[1])) > self.min_delta_position:
+        if Point(self.last_observation.pos[0], self.last_observation.pos[1]).distance(
+                Point(last_state.pos[0], last_state.pos[1])) > self.min_delta_position:
             self.last_observation = last_state
             return True
         else:
@@ -127,7 +133,6 @@ class Dave2Executor(AbstractTestExecutor):
         # For the execution we need the interpolated points
         nodes = the_test.interpolated_points
 
-
         brewer = self.brewer
         brewer.setup_road_nodes(nodes)
         beamng = brewer.beamng
@@ -136,93 +141,84 @@ class Dave2Executor(AbstractTestExecutor):
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
             # Note This changed since BeamNG.research
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.24', 'levels'))
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
-            # maps.print_paths()
 
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        cameras = BeamNGCarCameras()
-        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=cameras.cameras_array)
-        #vehicle_state_reader = VehicleStateReader(self.vehicle, beamng)
-
+        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
 
         steps = brewer.params.beamng_steps
         simulation_id = time.strftime('%Y-%m-%d--%H-%M-%S', time.localtime())
         name = 'beamng_executor/sim_$(id)'.replace('$(id)', simulation_id)
-        sim_data_collector = SimulationDataCollector(self.vehicle, beamng, brewer.decal_road, brewer.params,
-                                                     vehicle_state_reader=vehicle_state_reader,
-                                                     simulation_name=name)
+        self.sim_data_collector = SimulationDataCollector(self.vehicle, beamng, brewer.decal_road, brewer.params,
+                                                          vehicle_state_reader=vehicle_state_reader,
+                                                          simulation_name=name)
 
         # TODO: Hacky - Not sure what's the best way to set this...
-        sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
-
-        sim_data_collector.get_simulation_data().start()
+        self.sim_data_collector.oob_monitor.tolerance = self.oob_tolerance
+        self.sim_data_collector.get_simulation_data().start()
 
         try:
-            #start = timeit.default_timer()
             brewer.bring_up()
+
+            cameras = BeamNGCarCameras(beamng=beamng, vehicle=self.vehicle)
+
             if not self.model:
                 self.model = load_model(self.model_file)
             predict = NvidiaPrediction(self.model, self.maxspeed)
 
-            # iterations_count = int(self.test_time_budget/250)
-            # idx = 0
-            #brewer.vehicle.ai_set_aggression(self.risk_value)
-            #brewer.vehicle.ai_set_speed(self.maxspeed, mode='limit')
-            #brewer.vehicle.ai_drive_in_lane(True)
-            #brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
-
             while True:
-                # idx += 1
-                # assert idx < iterations_count, "Timeout Simulation " + str(sim_data_collector.name)
 
-                sim_data_collector.collect_current_data(oob_bb=True)
-                last_state: SimulationDataRecord = sim_data_collector.states[-1]
+                self.sim_data_collector.collect_current_data(oob_bb=True)
+                last_state: SimulationDataRecord = self.sim_data_collector.states[-1]
                 # Target point reached
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
                     break
 
-                assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(sim_data_collector.name)
+                assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(
+                    self.sim_data_collector.name)
 
-                assert not last_state.is_oob, "Car drove out of the lane " + str(sim_data_collector.name)
+                assert not last_state.is_oob, "Car drove out of the lane " + str(self.sim_data_collector.name)
 
-                img = vehicle_state_reader.sensors['cam_center']['colour'].convert('RGB')
-                # TODO
+                data_img = cameras.cameras_array['cam_center'].poll()
+                img = np.asarray(data_img['colour'].convert('RGB'))
+
                 steering_angle, throttle = predict.predict(img, last_state)
                 self.vehicle.control(throttle=throttle, steering=steering_angle, brake=0)
 
                 beamng.step(steps)
 
-
-
-            sim_data_collector.get_simulation_data().end(success=True)
-            #end = timeit.default_timer()
-            #run_elapsed_time = end-start
-            #run_elapsed_time = float(last_state.timer)
+            self.sim_data_collector.get_simulation_data().end(success=True)
+            # end = timeit.default_timer()
+            # run_elapsed_time = end-start
+            # run_elapsed_time = float(last_state.timer)
             # self.total_elapsed_time = self.get_elapsed_time()
         except AssertionError as aex:
-            sim_data_collector.save()
+            self.sim_data_collector.save()
             # An assertion that trigger is still a successful test execution, otherwise it will count as ERROR
-            sim_data_collector.get_simulation_data().end(success=True, exception=aex)
+            self.sim_data_collector.get_simulation_data().end(success=True, exception=aex)
             traceback.print_exception(type(aex), aex, aex.__traceback__)
         except Exception as ex:
-            sim_data_collector.save()
-            sim_data_collector.get_simulation_data().end(success=False, exception=ex)
+            self.sim_data_collector.save()
+            self.sim_data_collector.get_simulation_data().end(success=False, exception=ex)
             traceback.print_exception(type(ex), ex, ex.__traceback__)
         finally:
-            sim_data_collector.save()
+            self.sim_data_collector.save()
             try:
-                sim_data_collector.take_car_picture_if_needed()
+                self.sim_data_collector.take_car_picture_if_needed()
             except:
                 pass
 
-            self.end_iteration()
+            # TODO: better to close the simulator than to reuse it, as with the new version of BeamngPy the simulator
+            #  gets stuck when the simulator restarts.
+            self._close()
+            # self.end_iteration()
 
-        return sim_data_collector.simulation_data
+        return self.sim_data_collector.simulation_data
 
     def end_iteration(self):
         try:
@@ -234,7 +230,13 @@ class Dave2Executor(AbstractTestExecutor):
     def _close(self):
         if self.brewer:
             try:
-                self.brewer.beamng.close()
+                self.brewer.beamng.scenario.close()
+
+                beamng_program_name = "BeamNG.tech.x64"
+                cmd = "taskkill /IM \"{}.exe\" /F".format(beamng_program_name)
+                ret = subprocess.check_output(cmd)
+
+                output_str = ret.decode("utf-8")
             except Exception as ex:
                 traceback.print_exception(type(ex), ex, ex.__traceback__)
             self.brewer = None
