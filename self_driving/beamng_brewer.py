@@ -44,7 +44,7 @@ class BeamNGBrewer:
         # We need to wait until this point otherwise the BeamNG logger level will be (re)configured by BeamNGpy
         log.info("Disabling BEAMNG logs")
         for id in ["beamngpy", "beamngpy.beamngpycommon", "beamngpy.BeamNGpy", "beamngpy.beamng", "beamngpy.Scenario",
-                   "beamngpy.Vehicle"]:
+                   "beamngpy.Vehicle", "beamngpy.Camera"]:
             logger = log.getLogger(id)
             logger.setLevel(log.CRITICAL)
             logger.disabled = True
