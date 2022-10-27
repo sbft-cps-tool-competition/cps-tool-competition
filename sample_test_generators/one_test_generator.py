@@ -66,10 +66,6 @@ class OneTestGenerator():
         oob_percentage = [state.oob_percentage for state in execution_data]
         log.info("Collected %d states information. Max is %.3f", len(oob_percentage), max(oob_percentage))
 
-        plt.figure()
-        plt.plot(oob_percentage, 'bo')
-        plt.show()
-
         # Print test outcome
         log.info("test_outcome %s", test_outcome)
         log.info("description %s", description)

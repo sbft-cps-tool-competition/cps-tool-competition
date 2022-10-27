@@ -21,6 +21,6 @@ python-dateutil==2.8.2
 scipy==1.7.3
 setuptools-scm==6.3.2
 Shapely==1.8.0
-tensorflow==2.4.1
+tensorflow==2.10.0
 tomli==1.2.2
 zipp==3.6.0

@@ -45,10 +45,11 @@ class BeamngExecutor(AbstractTestExecutor):
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
         self.beamng_user = beamng_user
+        assert self.beamng_user is not None, "Please provide a --beamng-user folder"
 
         # TODO Add checks with default setup. This requires a call to BeamNGpy resolve  (~/Documents/BeamNG.research)
-        if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
-            log.warning("%s is missing but is required to use BeamNG.research", )
+        # if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
+        #     log.warning("%s is missing but is required to use BeamNG.research", )
 
         # Runtime Monitor about relative movement of the car
         self.last_observation = None
@@ -131,7 +132,7 @@ class BeamngExecutor(AbstractTestExecutor):
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
             # Note This changed since BeamNG.research
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.26', 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
