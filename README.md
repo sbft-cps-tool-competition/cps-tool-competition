@@ -1,6 +1,6 @@
 # Cyber-Physical Systems Testing Tool Competition #
 
-The [SBFT Workshop](https://sbst22.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbst22.github.io/tools/).
+The [SBFT Workshop](https://sbft23.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbft23.github.io/tools/).
 
 ## Important Dates
 
@@ -61,7 +61,7 @@ The following table summarizes the proposed weight assignment:
 We make available a [code pipeline](code_pipeline) that will integrate your test generator with the simulator by validating, executing and evaluating your test cases. Moreover, we offer some [sample test generators](sample_test_generators/README.md) to show how to use our code pipeline.
 
 ## Information About the Competition ##
-More information can be found on the SBST tool competition website: [https://sbst22.github.io/tools/](https://sbst22.github.io/tools/)
+More information can be found on the SBFT tool competition website: [https://sbft23.github.io/tools/](https://sbft23.github.io/tools/)
 
 ## Repository Structure ##
 [Code pipeline](code_pipeline): code that integrates your test generator with the simulator
