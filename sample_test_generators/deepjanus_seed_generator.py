@@ -238,7 +238,7 @@ class JanusGenerator():
 
             log.info("%s %s", str(test_outcome), str(description))
             count += 1
-            log.info("Remaining Time: %s", str(self.executor.get_remaining_time()))
+            log.info("Remaining Time: %s", str(self.executor.get_remaining_time()["time-budget"]))
 
             log.info("Successful tests: %s", str(count))
 

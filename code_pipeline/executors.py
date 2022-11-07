@@ -18,71 +18,36 @@ class Budget:
 
     # Note: We assume the values are validated at this point
     # TODO: Is this ok?
-    def __init__(self, generation_budget=None, execution_budget=None, time_budget=None):
-        self.generation_budget = generation_budget
-        self.execution_budget=execution_budget
-        self.time_budget=time_budget
-
+    def __init__(self, time_budget=None):
+        self.time_budget = time_budget
         self.start_real_time = None
-        self.elapsed_generation_time = None
-        self.elapsed_execution_time = None
 
     def start(self):
-        self.start_real_time = time.monotonic()
-        self.elapsed_generation_time = 0
-        self.elapsed_execution_time = 0
+        self.start_real_time = time.perf_counter()
 
     def get_start_time(self):
         return self.start_real_time
 
-    def consume_test_generation_time(self, consumed_real_time):
-        if self.time_budget is None:
-            self.elapsed_generation_time = self.elapsed_generation_time + consumed_real_time
-
-    def consume_execution_time(self, consumed_simulation_time):
-        if self.time_budget is None:
-            self.elapsed_execution_time = self.elapsed_execution_time + consumed_simulation_time
-
     # We need to ensure that we always return the same type of object:
     def get_remaining_time(self):
-        if self.time_budget is not None:
-            return {"time-budget": self.get_remaining_real_time()}
-        else:
-            return {"generation-budget": self.get_remaining_real_time(),
-                    "execution-budget": self.get_remaining_simulated_time()}
+        return {"time-budget": self.get_remaining_real_time()}
 
-    # TODO This API is a bit off as we mix real/simulated, generation/overall/execution
     def get_remaining_real_time(self):
-        if self.time_budget is not None:
-            log.debug("Remaining real time budget: ", self.time_budget - (time.monotonic() - self.start_real_time))
-            return self.time_budget - (time.monotonic() - self.start_real_time)
-        else:
-            return self.generation_budget - self.elapsed_generation_time
-
-    def get_remaining_simulated_time(self):
-        return self.execution_budget - self.elapsed_execution_time
+        log.debug("Remaining real time budget: ", self.time_budget - (time.perf_counter() - self.start_real_time))
+        return self.time_budget - (time.perf_counter() - self.start_real_time)
 
     def can_run_a_test(self):
-        if self.time_budget is not None:
-            return self.get_remaining_real_time() > 0
-        else:
-            return self.get_remaining_simulated_time() > 0
+        return self.get_remaining_real_time() > 0
 
     # General Check
     def is_over(self):
-        if self.time_budget is not None:
-            return self.get_remaining_real_time() <= 0
-        else:
-            return self.get_remaining_real_time() <= 0 or self.get_remaining_simulated_time() <= 0
-
-
+        return self.get_remaining_real_time() <= 0
 
 class AbstractTestExecutor(ABC):
 
     start_time = None
 
     def __init__(self, result_folder, map_size,
-                 generation_budget=None, execution_budget=None,
                  time_budget=None,
                  road_visualizer=None, debug=False):
 
@@ -92,7 +57,7 @@ class AbstractTestExecutor(ABC):
 
         self.stats = TestGenerationStatistic()
         # Setup the internal logic to check the time budget
-        self.time_budget = Budget(generation_budget=generation_budget, execution_budget=execution_budget, time_budget=time_budget)
+        self.time_budget = Budget(time_budget=time_budget)
         # Start counting for passed time
         self.time_budget.start()
 
@@ -116,9 +81,7 @@ class AbstractTestExecutor(ABC):
 
     def execute_test(self, the_test):
         # Mark that generation is over and log generation time
-        elapsed_generation_time = time.monotonic() - self.start_generation_time
-        # Update the budget
-        self.time_budget.consume_test_generation_time(elapsed_generation_time)
+        elapsed_generation_time = time.perf_counter() - self.start_generation_time
         # Update the statistics of the run
         self.stats.test_generation_real_times.append(elapsed_generation_time)
 
@@ -136,7 +99,6 @@ class AbstractTestExecutor(ABC):
         # Update the statistics of the run
         self.stats.test_generated += 1
 
-        # Pre-Processing: Do not count towards test-execution or test_generation budget, but counts for overall_budget
         is_valid, validation_msg = self.validate_test(the_test)
 
         # This might be placed inside validate_test, but we keep it out since validate_test can be also called by client
@@ -155,20 +117,17 @@ class AbstractTestExecutor(ABC):
             description = None
             execution_data = None
             try:
-                start_execution_real_time = time.monotonic()
+                start_execution_real_time = time.perf_counter()
                 test_outcome, description, execution_data = self._execute(the_test)
             finally:
                 # Log time also on error
-                real_time_elapsed = time.monotonic() - start_execution_real_time
+                real_time_elapsed = time.perf_counter() - start_execution_real_time
                 # Update the statistics of the run
                 self.stats.test_execution_real_times.append(real_time_elapsed)
 
             # Check that at least one element is there
             if execution_data and len(execution_data) > 0:
                 simulated_time_elapsed = execution_data[-1].timer
-
-                # Add the simulated time
-                self.time_budget.consume_execution_time(simulated_time_elapsed)
 
                 if self.time_budget.is_over():
                     # The last test should not be considered since it went OVER budget
@@ -179,9 +138,6 @@ class AbstractTestExecutor(ABC):
                 else:
                     # Update the statistics of the run
                     self.stats.test_execution_simulation_times.append(simulated_time_elapsed)
-            else:
-                # We do not have a penalty for broken tests
-                log.warning(f"There are no execution data for test {the_test} so I cannot decrease simulated time")
 
             # Decorating the_test with additional attributes
             setattr(the_test, 'execution_data', execution_data)
@@ -225,9 +181,7 @@ class AbstractTestExecutor(ABC):
             execution_data = []
 
         # Mark that generation is restarted.
-        self.start_generation_time = time.monotonic()
-
-        log.debug(f"Restarting the generation timer. Remaining time {self.get_remaining_time()}")
+        self.start_generation_time = time.perf_counter()
 
         return test_outcome, description, execution_data
 
@@ -294,10 +248,8 @@ class MockExecutor(AbstractTestExecutor):
 
         execution_data = [sim_state]
 
-        log.info("Pretend test is executing for 5 seconds. Simulate the exeuction of a test that lasts for 3 simulated seconds")
+        log.info("Pretend test is executing for 5 seconds.")
         time.sleep(5)
-        # Is this really necessary ?!
-        # self.total_elapsed_time += 5
 
         return test_outcome, description, execution_data
 

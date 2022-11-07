@@ -34,26 +34,8 @@ class CommandLineCombinationTest(unittest.TestCase):
 
 class TimeBudgetCombinationTest(unittest.TestCase):
 
-    def test_fail_when_none_is_defined(self):
-        runner = CliRunner()
-        result = runner.invoke(generate, ['--executor', 'mock', '--map-size', '200', '--module-name', 'foo', '--class-name', 'Foo'])
-        output = result.output
-        assert "Error: At least one of those options must be defined ['--time-budget', '--generation-budget', '--execution-budget']" in output, output
-
     def test_do_not_fail_when_time_budget_is_defined(self):
         runner = CliRunner()
         result = runner.invoke(generate, ['--time-budget', '10', '--executor', 'mock', '--map-size', '200', '--module-name', 'foo', '--class-name', 'Foo'])
         output = result.output
         assert "Started test generation" in output, output
-
-    def test_do_not_fail_when_generation_and_execution_budgets_are_defined(self):
-        runner = CliRunner()
-        result = runner.invoke(generate, ['--generation-budget', '10', '--execution-budget', '20', '--executor', 'mock', '--map-size', '200', '--module-name', 'foo', '--class-name', 'Foo'])
-        output = result.output
-        assert "Started test generation" in output, output
-
-    def test_fail_when_all_are_defined(self):
-        runner = CliRunner()
-        result = runner.invoke(generate, ['--time-budget', '10', '--generation-budget', '10', '--execution-budget', '20', '--executor', 'mock', '--map-size', '200', '--module-name', 'foo', '--class-name', 'Foo'])
-        output = result.output
-        assert "Error: Only one of those options must be defined" in output, output
