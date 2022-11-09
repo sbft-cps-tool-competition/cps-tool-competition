@@ -1,8 +1,7 @@
 import subprocess
 
-import cv2
 import numpy as np
-from tensorflow.keras.models import load_model
+from tensorflow.python.keras.models import load_model
 
 from code_pipeline.executors import AbstractTestExecutor
 
@@ -31,15 +30,12 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class Dave2Executor(AbstractTestExecutor):
 
-    def __init__(self, result_folder, map_size, dave2_model, max_speed,
-                 generation_budget=None, execution_budget=None, time_budget=None, oob_tolerance=0.95,
+    def __init__(self, result_folder, map_size, dave2_model,
+                 time_budget=None,
+                 oob_tolerance=0.95, max_speed=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
         super(Dave2Executor, self).__init__(result_folder, map_size,
-                                            generation_budget=generation_budget, execution_budget=execution_budget,
                                             time_budget=time_budget, debug=debug)
-
-        # TODO Is this still valid?
-        # self.test_time_budget = 250000
 
         self.risk_value = 0.7
 

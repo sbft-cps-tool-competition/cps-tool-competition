@@ -17,20 +17,20 @@ Please fill the "Application Text" field of the registration form with the follo
 
 ```
 I would like to participate to the "Testing Self-Driving Car Software
-Contest" of the SBST Tool Competition 2022 and for that I need to a
+Contest" of the SBSF Tool Competition 2023 and for that I need to a
 copy of BeamNG.tech
 ```
 
-> **Note**: as stated on the BeamNG registration page, **please use your university email address**. 
+> **Note**: As stated on the BeamNG registration page, **please use your university email address**. 
 If you do not own a university email address, please contact the organizers of the tool competition. 
 
-For the competition we use `BeamNG.tech v0.24.0.1`, please make sure you download exactly this version of the simulator, i.e., file `BeamNG.tech.v0.24.0.1.zip`.
+For the competition we use `BeamNG.tech v0.26.1.0`, please make sure you download exactly this version of the simulator, i.e., file `BeamNG.tech.v0.26.1.0.zip`.
 
-Installing BeamNG.tech is as simple as extracting the files to a target folder in your system (e.g., `C:\BeamNG.tech.v0.24.0.1`). We call this folder `<BEAMNG_HOME>`. Additionally, we suggest you create another folder (e.g., `C:\BeamNG.tech.v0.24.0.1_userpath`) that will act as BeamNG.tech working dir. BeamNG.tech will copy in this directory the levels and its cache. We call this folder `<BEAMNG_USER>`.
+Installing BeamNG.tech is as simple as extracting the files to a target folder in your system (e.g., `C:\BeamNG.tech.v0.26.1.0`). We call this folder `<BEAMNG_HOME>`. Additionally you need to create another folder (e.g., `C:\BeamNG.tech.v0.26.1.0_userpath`) that will act as BeamNG.tech working dir. BeamNG.tech will copy in this directory the levels and its cache. We call this folder `<BEAMNG_USER>`.
 
 Please copy the `tech.key` file that you received after registering inside the `<BEAMNG_USER>` folder.
 
-> NOTE: Make sure that `<BEAMNG_HOME>` and `<BEAMNG_USER>` contain no spaces nor special characters.
+> NOTE: Make sure that `<BEAMNG_HOME>` and `<BEAMNG_USER>` contain no spaces nor special characters. We have observed misbehavior if `<BEAMNG_HOME>` and `<BEAMNG_USER>` are the same folder. Please use different folders.
 
 ### Python ###
 
@@ -61,9 +61,9 @@ Otherwise, you can manually install each required library listed in the ```requi
 
 > **Note**: the version of Shapely should match your system (see below).
 
-In case your test generator requires additional library, please store them into an additional requirement file to be submitted along with your code.
+In case your test generator requires an additional library, please store them into an additional requirement file to be submitted along with your code.
 
-To create such a file you can run the following command from within your active virtual environment:
+To create such a file you can run the following command within your active virtual environment:
 
 ```
 pip freeze > additional-requirements.txt
@@ -96,13 +96,13 @@ pip install /path/to/shapely/file
 
 * OS: Windows 10 64-Bit
 * CPU: AMD Ryzen 7 1700 3.0Ghz / Intel Core i7-6700 3.4Ghz (or better)
-* RAM: 16 GB RAM
+* RAM: 23 GB RAM
 * GPU: AMD R9 290 / Nvidia GeForce GTX 970
 * DirectX: Version 11
-* Storage: 20 GB available space
+* Storage: 45 GB available space
 * Additional Notes: Recommended spec based on 1080p resolution. Installing game mods will increase required storage space. Gamepad recommended.
 
->**Note**: BeamNG.tech can run also on Mac Book provided you boot them on Windows or use a system virtualization
+>**Note**: BeamNG.tech can run also on a Mac Book provided you boot it on Windows or use a system virtualization
 >software like Parallel Desktop. In the past, others managed to run the pipeline on the Amazon Cloud using an appropriate 
 >AMI.
  

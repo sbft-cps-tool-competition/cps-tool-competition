@@ -22,7 +22,7 @@ class NvidiaPrediction:
             image = np.array([image])
 
             with tf.device('/cpu:0'):
-                steering_angle = float(self.model.predict(image, batch_size=1))
+                steering_angle = float(self.model.predict(image, batch_size=1, verbose=0))
 
             speed = car_state.vel_kmh
             if speed > self.speed_limit:

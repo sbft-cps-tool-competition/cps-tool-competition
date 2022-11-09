@@ -25,16 +25,11 @@ FloatDTuple = Tuple[float, float, float, float]
 class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, map_size,
-                 generation_budget=None, execution_budget=None, time_budget=None,
+                 time_budget=None,
                  oob_tolerance=0.95, max_speed_in_kmh=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
         super(BeamngExecutor, self).__init__(result_folder, map_size,
-                                             generation_budget=generation_budget, execution_budget=execution_budget,
                                              time_budget=time_budget, debug=debug)
-
-        # TODO Is this still valid?
-        # self.test_time_budget = 250000
-
 
         # TODO This is specific to the TestSubject, we should encapsulate this better
         self.risk_value = 0.7
