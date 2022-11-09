@@ -53,7 +53,7 @@ class BeamNGBrewer:
         if road_nodes:
             self.setup_road_nodes(road_nodes)
 
-        steps = 5
+        steps = 60  # real time
         self.params = SimulationParams(beamng_steps=steps, delay_msec=int(steps * 0.05 * 1000))
         self.vehicle_start_pose = BeamNGPose()
 
@@ -84,12 +84,13 @@ class BeamNGBrewer:
 
         self.scenario.make(self.beamng)
         self.beamng.set_deterministic()
+        # self.beamng.set_steps_per_second(120)  # Set simulator to 60hz temporal resolution
+        # self.beamng.remove_step_limit()
         self.beamng.load_scenario(self.scenario)
 
         self.beamng.start_scenario()
 
-        # TODO: Pause the simulator only after loading and starting the scenario causes the simulation to slow down
-        # self.beamng.pause()
+        self.beamng.pause()
 
     def __del__(self):
         if self.beamng:
