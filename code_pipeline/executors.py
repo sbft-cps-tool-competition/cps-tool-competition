@@ -54,7 +54,7 @@ class Budget:
     # TODO This API is a bit off as we mix real/simulated, generation/overall/execution
     def get_remaining_real_time(self):
         if self.time_budget is not None:
-            log.debug("Remaining real time budget: ", self.time_budget - (time.monotonic() - self.start_real_time))
+            log.debug(f"Remaining real time budget: {self.time_budget - (time.monotonic() - self.start_real_time)}")
             return self.time_budget - (time.monotonic() - self.start_real_time)
         else:
             return self.generation_budget - self.elapsed_generation_time
