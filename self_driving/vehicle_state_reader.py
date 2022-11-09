@@ -21,7 +21,7 @@ class VehicleStateReader:
 
         #assert 'state' in self.vehicle.sensors.keys(), "Default state sensor is missing"
         # Starting from BeamNG.tech 0.23.5_1 once the scenario is over a vehicle's sensors get automatically detached
-        # Including the defatul state sensor... so we need to ensure that is there somehow, or stop reusing the vehicle
+        # Including the default state sensor so we need to ensure that is there somehow, or stop reusing the vehicle
         # object across simulations
         try:
             state = State()
