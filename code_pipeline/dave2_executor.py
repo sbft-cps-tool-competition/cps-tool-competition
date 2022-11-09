@@ -1,7 +1,8 @@
 import subprocess
 
+import cv2
 import numpy as np
-from tensorflow.python.keras.models import load_model
+from tensorflow.keras.models import load_model
 
 from code_pipeline.executors import AbstractTestExecutor
 
@@ -30,9 +31,8 @@ FloatDTuple = Tuple[float, float, float, float]
 
 class Dave2Executor(AbstractTestExecutor):
 
-    def __init__(self, result_folder, map_size, dave2_model,
-                 generation_budget=None, execution_budget=None, time_budget=None,
-                 oob_tolerance=0.95, max_speed=70,
+    def __init__(self, result_folder, map_size, dave2_model, max_speed,
+                 generation_budget=None, execution_budget=None, time_budget=None, oob_tolerance=0.95,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
         super(Dave2Executor, self).__init__(result_folder, map_size,
                                             generation_budget=generation_budget, execution_budget=execution_budget,
@@ -169,7 +169,7 @@ class Dave2Executor(AbstractTestExecutor):
 
             if not self.model:
                 self.model = load_model(self.model_file)
-            predict = NvidiaPrediction(self.model, self.maxspeed)
+            predict = NvidiaPrediction(model=self.model, max_speed=self.maxspeed)
 
             while True:
 
@@ -187,10 +187,10 @@ class Dave2Executor(AbstractTestExecutor):
                 data_img = cameras.cameras_array['cam_center'].poll()
                 img = np.asarray(data_img['colour'].convert('RGB'))
 
-                steering_angle, throttle = predict.predict(img, last_state)
+                steering_angle, throttle = predict.predict(image=img, car_state=last_state, normalize=True)
                 self.vehicle.control(throttle=throttle, steering=steering_angle, brake=0)
 
-                beamng.step(steps)
+                beamng.step(steps, wait=False)
 
             self.sim_data_collector.get_simulation_data().end(success=True)
             # end = timeit.default_timer()
