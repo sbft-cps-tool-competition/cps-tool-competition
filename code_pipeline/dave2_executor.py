@@ -137,7 +137,7 @@ class Dave2Executor(AbstractTestExecutor):
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
             # Note This changed since BeamNG.research
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, 'levels'))
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.26', 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
 
