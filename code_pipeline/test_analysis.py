@@ -90,7 +90,7 @@ def direction_coverage_klk(the_test, n_bins=36):
     if not isinstance(the_test, list):
         the_test = the_test.interpolated_points
     np_arr = np.array(the_test)
-    thetas, kappas = get_thetas(np_arr[:, 0], np_arr[:, 1])
+    thetas = get_thetas(np_arr[:, 0], np_arr[:, 1])
     coverage_buckets = np.linspace(-np.pi, np.pi, num=n_bins)
     covered_elements = set(np.digitize(thetas, coverage_buckets))
     dir_coverage = len(covered_elements) / len(coverage_buckets)
