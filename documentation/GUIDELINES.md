@@ -223,21 +223,6 @@ or
         --class-name JanusGenerator
 ```
 
-Instead, if you want to give the test generator 300 seconds to generate the tests but 600 (simulated) seconds to execute them, you need to update the command as follows:
-
-``` 
-py.exe competition.py \
-        --generation-budget 300 \
-        --execution-budget 600 \
-        --executor beamng \
-        --beamng-home <BEAMNG_HOME> --beamng-user <BEAMNG_USER> \
-        --map-size 200 \
-        --module-name sample_test_generators.one_test_generator \
-        --class-name OneTestGenerator
-```
-
-> Note: `time-budget` and `generation-/execution-budget` cannot be used together. If you provide all options, `time-budget` takes over the other settings.
-
 ### Using the public test generators submitted to previous SBST competitions
 
 To exemplify how one can use a custom generator, we imported existing test generators that have been submitted to past editions of the competition as git submodules (read more about this [here](https://git-scm.com/book/it/v2/Git-Tools-Submodules)).
