@@ -4,17 +4,19 @@ The [SBFT Workshop](https://sbft23.github.io/) offers a challenge for software t
 
 ## Important Dates
 
-The deadline to submit your tool is: **January 21st 2022**
+The deadline to submit your tool is: **January 13st 2023**
 
-The results of the evaluation will be communicated to participants on: **February 25th 2022**
+The results of the evaluation will be communicated to participants on: **February 24th 2023**
 
-The camera-ready paper describing your tool is due to: **Sunday March 18th 2020**
+The camera-ready paper describing your tool is due to: **March 17th 2023**
 
 ## Goal ##
-The competitors should generate virtual roads to test a lane keeping assist system using the provided code_pipeline.
+The competitors should generate virtual roads to test a lane keeping assist system using the provided code pipeline. The aim of the generation is falsification: the roads produced should make the lane keeping assist system drive out of the lane. The ranking of the tools is based on coverage which measures the number of failed tests and their quality. We do this as it is in the interest of any system tester to provide as diverse failures as possible. This facilitates better root cause analysis. 
 
 The generated roads are evaluated in the [**BeamNG.tech**](https://www.beamng.tech/) driving simulator.
 This simulator is ideal for researchers due to its state-of-the-art soft-body physics simulation, ease of access to sensory data, and a Python API to control the simulation.
+
+In the competition two lane keeping assists are used: BeamnNG.AI provided by the BeamnNG.tech simulator and DAVE-2 trained by the competition organizers.
 
 [![Video by BeamNg GmbH](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)
 
@@ -22,57 +24,30 @@ This simulator is ideal for researchers due to its state-of-the-art soft-body ph
 
 ## Comparing the Test Generators ##
 
-Deciding which test generator is the best is far from trivial and, currently, remains an open challenge. In this competition, we rank test generators by considering various metrics of effectiveness and efficiency that characterize the generated tests but also the process of generating them, i.e., test generation. We believe that our approach to compare test generators is objective and fair, and it can provide a compact metric to rank them.
+Deciding which test generator is the best is far from trivial and, currently, remains an open challenge. In the 2023 instance of the competition, we rank the test generators according to a coverage metric. This means that we select relevant features, build a feature map for them, and compute how much each tool covers this map. Possible features to be used include
+* Direction Coverage (DirCov).
+* Standard Deviation of the Steering Angle (StdSA).
+* Maximum Curvature (MaxCurv).
+* Mean Lateral Position (MLP).
 
-### Ranking Formula
-
-The formula to rank test generators is the following weighted sum:
-
-```
-rank = a * OOB_Coverage + b * test_generation_efficiency + c *  test_generation_effectiveness
-```
-
-where:
-
-- `OOB_Coverage` captures the effectiveness of the generated tests that must expose as many failures as possible (i.e., Out Of Bound episodes) but also as many different failures as possible. We compute this metric by extending the approach adopted in the previous edition of the competition with our recent work on [Illumination Search](https://dl.acm.org/doi/10.1145/3460319.3464811). As an example, our novel approach has been already adopted for the generation of relevant test cases from existing maps (see [SALVO](https://ieeexplore.ieee.org/document/9564107)). Therefore, we identify tests' portion relevant to the OOBs, extract their structural and behavioral features, and populate feature maps of a predefined size (i.e., 25x25 cells). Finally, we define `OOB_Coverage` by counting the cells in the map covered by the exposed OOBs. **Larger values of `OOB_Coverage` identify better test generators.**
-
-- `test_generation_efficiency` captures the efficiency in generating, but not executing, the tests. We measure it as the inverse of the average time it takes for the generators to create the tests normalized using the following (standard) formula: 
-
-    ``` norm(x) = (x - min) / (max - min)```
-
-    Where `min` and `max` are values empirically found during the benchmarking as the minimum and maximum average times for generating test across all the competitors.
-
-- `test_generation_effectiveness` captures the ability of the test generator to create valid tests; therefore, we compute it as the ratio of valid tests over all the generated tests.
-
-
-### Setting the Weights
-
-We set the values of the in the ranking formula's weights (i.e., `a`, `b`, and `c`) to rank higher the test generators that trigger many and different failures; test generation efficiency and effectiveness are given equal but secondary importance. The motivation behind this choice is that test generators' main goal is to trigger failures, while being efficient and effective in generating the tests is of second order importance.
-
-The following table summarizes the proposed weight assignment:
-
-| a | b | c |
-|---|---|---|
-|0.6|0.2|0.2|
-
-
+We expect that the submitted tools are stochastic in nature, so we compute the coverage as the total coverage over several repetitions of the tool.
 
 ## Implement Your Test Generator ##
 We make available a [code pipeline](code_pipeline) that will integrate your test generator with the simulator by validating, executing and evaluating your test cases. Moreover, we offer some [sample test generators](sample_test_generators/README.md) to show how to use our code pipeline.
 
 ## Information About the Competition ##
-More information can be found on the SBFT tool competition website: [https://sbft23.github.io/tools/](https://sbft23.github.io/tools/)
+More information can be found on the SBFT tool competition website: [https://sbft23.github.io/tools/](https://sbft23.github.io/tools/) See also the tool report of the previous competition instance: <https://ieeexplore.ieee.org/document/9810771>
 
 ## Repository Structure ##
-[Code pipeline](code_pipeline): code that integrates your test generator with the simulator
+[Code pipeline](code_pipeline): code that integrates your test generator with the simulator.
 
-[Self driving car testing library](self_driving): library that helps the integration of the test input generators, our code pipeline, and the BeamNG simulator
+[Self driving car testing library](self_driving): library that helps the integration of the test input generators, our code pipeline, and the BeamNG simulator.
 
-[Scenario template](levels_template/tig): basic scenario used in this competition
+[Scenario template](levels_template/tig): basic scenario used in this competition.
 
-[Documentation](documentation/README.md): contains the installation guide, detailed rules of the competition, and the frequently asked questions
+[Documentation](documentation/README.md): contains the installation guide, detailed rules of the competition, and the frequently asked questions.
 
-[Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes 
+[Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes.
 
 [Requirements](requirements.txt): contains the list of the required packages.
 
