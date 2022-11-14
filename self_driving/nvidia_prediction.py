@@ -5,14 +5,14 @@ from self_driving.image_processing import preprocess
 
 import tensorflow as tf
 
-MIN_SPEED = 20
-
 
 class NvidiaPrediction:
     def __init__(self, model, max_speed):
         self.model = model
         self.speed_limit = max_speed
         self.max_speed = max_speed
+        # with min_speed = max_speed we keep a constant velocity throughout the simulation
+        self.min_speed = max_speed
 
     def predict(self, image, car_state: SimulationDataRecord, normalize: bool = False):
         try:
@@ -26,7 +26,7 @@ class NvidiaPrediction:
 
             speed = car_state.vel_kmh
             if speed > self.speed_limit:
-                self.speed_limit = MIN_SPEED  # slow down
+                self.speed_limit = self.min_speed  # slow down
             else:
                 self.speed_limit = self.max_speed
 

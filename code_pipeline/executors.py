@@ -43,8 +43,8 @@ class Budget:
     def is_over(self):
         return self.get_remaining_real_time() <= 0
 
-class AbstractTestExecutor(ABC):
 
+class AbstractTestExecutor(ABC):
     start_time = None
 
     def __init__(self, result_folder, map_size,
@@ -112,12 +112,8 @@ class AbstractTestExecutor(ABC):
             # Update the statistics of the run
             self.stats.test_valid += 1
 
-            # TODO Consider making this a context manager or some sort of decorator
-            test_outcome = None
-            description = None
-            execution_data = None
+            start_execution_real_time = time.perf_counter()
             try:
-                start_execution_real_time = time.perf_counter()
                 test_outcome, description, execution_data = self._execute(the_test)
             finally:
                 # Log time also on error
@@ -146,6 +142,8 @@ class AbstractTestExecutor(ABC):
 
             # Compute the features dict of this test and
             features = compute_all_features(the_test, execution_data)
+
+            log.info("Features: {}".format(features))
 
             # Decorating the_test with the features
             setattr(the_test, 'features', features)
@@ -228,22 +226,22 @@ class MockExecutor(AbstractTestExecutor):
 
         sim_state = SimulationDataRecord(
             timer=3.0,
-            pos= [0.0, 0.0, 1.0],
-            dir= [0.0, 0.0, 1.0],
-            vel= [0.0, 0.0, 1.0],
-            steering= 0.0,
-            steering_input= 0.0,
-            brake= 0.0,
-            brake_input= 0.0,
-            throttle= 0.0,
-            throttle_input= 0.0,
-            wheelspeed= 0.0,
-            vel_kmh = 0.0,
-            is_oob = False,
-            oob_counter = 0,
-            max_oob_percentage = 0.0,
-            oob_distance = 0.0,
-            oob_percentage= 50.0
+            pos=[0.0, 0.0, 1.0],
+            dir=[0.0, 0.0, 1.0],
+            vel=[0.0, 0.0, 1.0],
+            steering=0.0,
+            steering_input=0.0,
+            brake=0.0,
+            brake_input=0.0,
+            throttle=0.0,
+            throttle_input=0.0,
+            wheelspeed=0.0,
+            vel_kmh=0.0,
+            is_oob=False,
+            oob_counter=0,
+            max_oob_percentage=0.0,
+            oob_distance=0.0,
+            oob_percentage=50.0
         )
 
         execution_data = [sim_state]

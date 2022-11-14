@@ -27,15 +27,8 @@ class BeamNGCamera:
 
 
 class BeamNGBrewer:
-    def __init__(self, beamng_home=None, beamng_user=None, reuse_beamng=False, road_nodes: List4DTuple = None):
+    def __init__(self, beamng_home=None, beamng_user=None, road_nodes: List4DTuple = None):
         self.scenario = None
-        self.reuse_beamng = reuse_beamng
-
-        # if self.reuse_beamng:
-            # This represents the running BeamNG simulator. Since we use launch=True this should automatically
-            # shut down when the main python process exits or when we call self.beamng_process.stop()
-            # self.beamng_process = BeamNGpy('localhost', 64256, home=beamng_home, user=beamng_user)
-            # self.beamng_process = self.beamng_process.open(launch=True)
 
         # This is used to bring up each simulation without restarting the simulator
         self.beamng = BeamNGpy('localhost', 64256, home=beamng_home, user=beamng_user)
@@ -53,7 +46,7 @@ class BeamNGBrewer:
         if road_nodes:
             self.setup_road_nodes(road_nodes)
 
-        steps = 60  # real time
+        steps = 100  # real time
         self.params = SimulationParams(beamng_steps=steps, delay_msec=int(steps * 0.05 * 1000))
         self.vehicle_start_pose = BeamNGPose()
 
@@ -67,14 +60,7 @@ class BeamNGBrewer:
         self.vehicle = Vehicle('ego_vehicle', model='etk800', licence='TIG', color='Red')
         return self.vehicle
 
-    # TODO COnsider to transform brewer into a ContextManager or get rid of it...
     def bring_up(self):
-
-        # if self.reuse_beamng:
-        #     # This assumes BeamNG is already running
-        #     self.beamng.open(launch=False)
-        # else:
-        #     self.beamng.open(launch=True)
 
         # After 1.18 to make a scenario one needs a running instance of BeamNG
         self.scenario = Scenario('tig', 'tigscenario')
