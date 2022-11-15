@@ -46,6 +46,9 @@ More information can be found on the SBFT tool competition website: [https://sbf
 [Scenario template](levels_template/tig): basic scenario used in this competition.
 
 [Documentation](documentation/README.md): contains the installation guide, detailed rules of the competition, and the frequently asked questions.
+* [Installation Guide](documentation/INSTALL.md): information about the prerequisites and how to install the code pipeline.
+* [Guidelines](documentation/GUIDELINES.md): goal and rules of the competition.
+* [FAQ](documentation/FAQ.md): answers to the most frequent asked questions.
 
 [Sample test generators](sample_test_generators/README.md): sample test generators already integrated with the code pipeline for illustrative purposes.
 
