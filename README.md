@@ -60,6 +60,10 @@ The software we developed is distributed under GNU GPL license. See the [LICENSE
 
 ## Contacts ##
 
-Dr. Alessio Gambi  - Passau University, Germany - alessio.gambi@uni-passau.de
+Dr. Matteo Biagiola  - Università della Svizzera italiana, Lugano, Switzerland - matteo.biagiola@usi.ch
 
-Dr. Vincenzo Riccio  - Universita' della Svizzera Italiana, Lugano, Switzerland - vincenzo.riccio@usi.ch
+Dr. Stefan Klikovits - National Institute of Informatics, Tokyo, Japan - klikovits@nii.ac.jp
+
+Dr. Jarkko Peltomäki - Åbo Akademi University, Turku, Finland - jarkko.peltomaki@abo.fi
+
+Dr. Vincenzo Riccio  - Università di Udine, Udine, Italia - vincenzo.riccio@uniud.it
