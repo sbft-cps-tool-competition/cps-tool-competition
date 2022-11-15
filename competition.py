@@ -358,7 +358,6 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
 
-    #     def __init__(self, result_folder, map_size, dave2_model,
     elif executor == "dave2":
         from code_pipeline.dave2_executor import Dave2Executor
         the_executor = Dave2Executor(result_folder, map_size, dave2_model,

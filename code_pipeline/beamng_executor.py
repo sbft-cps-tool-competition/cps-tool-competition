@@ -190,9 +190,6 @@ class BeamngExecutor(AbstractTestExecutor):
             except:
                 pass
 
-            # self.end_iteration()
-            # TODO: better to close the simulator than to reuse it, as with the new version of BeamngPy the simulator
-            #  gets stuck when the simulator restarts.
             self._close()
 
         return sim_data_collector.simulation_data

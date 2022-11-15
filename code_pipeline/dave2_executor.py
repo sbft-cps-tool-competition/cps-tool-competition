@@ -189,10 +189,6 @@ class Dave2Executor(AbstractTestExecutor):
                 beamng.step(steps, wait=False)
 
             self.sim_data_collector.get_simulation_data().end(success=True)
-            # end = timeit.default_timer()
-            # run_elapsed_time = end-start
-            # run_elapsed_time = float(last_state.timer)
-            # self.total_elapsed_time = self.get_elapsed_time()
         except AssertionError as aex:
             self.sim_data_collector.save()
             # An assertion that trigger is still a successful test execution, otherwise it will count as ERROR
@@ -209,10 +205,7 @@ class Dave2Executor(AbstractTestExecutor):
             except:
                 pass
 
-            # TODO: better to close the simulator than to reuse it, as with the new version of BeamngPy the simulator
-            #  gets stuck when the simulator restarts.
             self._close()
-            # self.end_iteration()
 
         return self.sim_data_collector.simulation_data
 
