@@ -16,7 +16,7 @@ The competitors should generate virtual roads to test a lane keeping assist syst
 The generated roads are evaluated in the [**BeamNG.tech**](https://www.beamng.tech/) driving simulator.
 This simulator is ideal for researchers due to its state-of-the-art soft-body physics simulation, ease of access to sensory data, and a Python API to control the simulation.
 
-In the competition two lane keeping assists are used: BeamnNG.AI provided by the BeamnNG.tech simulator and DAVE-2 trained by the competition organizers.
+In the competition two lane keeping assist systems are used: BeamnNG.AI provided by the BeamnNG.tech simulator and DAVE-2 trained by the competition organizers (with a `speed-limit` of 25 km/h).
 
 [![Video by BeamNg GmbH](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)
 
@@ -24,7 +24,8 @@ In the competition two lane keeping assists are used: BeamnNG.AI provided by the
 
 ## Comparing the Test Generators ##
 
-Deciding which test generator is the best is far from trivial and, currently, remains an open challenge. In the 2023 instance of the competition, we rank the test generators according to a coverage metric. This means that we select relevant features, build a feature map for them, and compute how much each tool covers this map. Possible features to be used include
+Deciding which test generator is the best is far from trivial and, currently, remains an open challenge. In the 2023 instance of the competition, we rank the test generators according to a coverage metric. This means that we select relevant features, build a feature map for them, and compute how much each tool covers this map. Possible features to be used include:
+
 * Direction Coverage (DirCov).
 * Standard Deviation of the Steering Angle (StdSA).
 * Maximum Curvature (MaxCurv).
@@ -46,6 +47,7 @@ More information can be found on the SBFT tool competition website: [https://sbf
 [Scenario template](levels_template/tig): basic scenario used in this competition.
 
 [Documentation](documentation/README.md): contains the installation guide, detailed rules of the competition, and the frequently asked questions.
+
 * [Installation Guide](documentation/INSTALL.md): information about the prerequisites and how to install the code pipeline.
 * [Guidelines](documentation/GUIDELINES.md): goal and rules of the competition.
 * [FAQ](documentation/FAQ.md): answers to the most frequent asked questions.
