@@ -260,7 +260,9 @@ py.exe competition.py \
         --executor beamng \
         --beamng-home <BEAMNG_HOME> --beamng-user <BEAMNG_USER> \
         --map-size 200 \
-        --module-path swat-sbst21 \
+        --module-path swat-sbst2021 \
         --module-name swat_gen.swat_generator \
         --class-name SwatTestGenerator
 ```
+
+In case of import errors, check that you have installed the packages listed in the respective `requirements.txt` file for Frenetic and SWAT.

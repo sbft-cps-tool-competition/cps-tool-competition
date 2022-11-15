@@ -35,7 +35,8 @@ class RandomTestGenerator():
             # Decorate the_test object with the id attribute
             the_test = RoadTestFactory.create_road_test(road_points)
 
-            log.info(f"Simulated test generation for 0.5 sec. Remaining time {self.executor.get_remaining_time()}")
+            time_remaining = self.executor.get_remaining_time()["time-budget"]
+            log.info(f"Simulated test generation for 0.5 sec. Remaining time {time_remaining}")
             # Try to execute the test
             test_outcome, description, execution_data = self.executor.execute_test(the_test)
             time_remaining = self.executor.get_remaining_time()["time-budget"]
