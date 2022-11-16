@@ -107,5 +107,5 @@ pip install /path/to/shapely/file
 >software like Parallel Desktop. In the past, others managed to run the pipeline on the Amazon Cloud using an appropriate 
 >AMI.
  
-A porting to linux is expected in the near future, but we cannot guarantee it will be ready before
+A porting to Linux is expected in the near future, but we cannot guarantee it will be ready before
 the tool competition's deadline. You can track the following [issue on GitHub](https://github.com/BeamNG/BeamNGpy/issues/79) about Linux porting.
