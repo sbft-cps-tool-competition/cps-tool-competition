@@ -102,11 +102,11 @@ The test generators' evaluation will be conducted using the same simulation and 
 the development. Still, we will not release the test subjects used for the evaluation before the
 submission deadline to avoid biasing the solutions towards it.
 
-As explained [here](../README.md), the evaluation is based on a coverage of a feature with features possibly including
+As explained [here](../README.md), the evaluation is based on a feature coverage with features possibly including:
 * Direction Coverage (DirCov). This measures how many directions a road segment covers. We measure the angles between adjacent road points and place these angles into bins each spanning 36 degrees.
 * Standard Deviation of the Steering Angle (StdSA). We compute the standard deviation of the car steering angle during a road segment.
-* Maximum Curvature (MaxCurv).
-* Mean Lateral Position (MLP).
+* Maximum Curvature (MaxCurv). We quantify the smoothness of a road as the inverse of its turns’ radius.
+* Mean Lateral Position (MLP). We measure how close the driving agent drives to the lane margins.
  
 The features are computed only for failed tests with respect to the road segment relevant to the failure. This segment is the 60 unit long segment centered around the out-of-bounds location (30 units before, 30 units after).
 For the evaluation we will consider (at least) the following metrics:
