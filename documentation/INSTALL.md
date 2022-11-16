@@ -35,7 +35,7 @@ Please copy the `tech.key` file that you received after registering inside the `
 
 ### Python ###
 
-The code has been developed using Python 3.7. It should run without issues on Python 3.9 and Python 3.10.
+The code has been developed using Python 3.7. It should run without issues on Python 3.8.
 
 ### Other Libraries ###
 
