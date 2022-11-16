@@ -46,7 +46,7 @@ class BeamNGBrewer:
         if road_nodes:
             self.setup_road_nodes(road_nodes)
 
-        steps = 100  # real time
+        steps = 80
         self.params = SimulationParams(beamng_steps=steps, delay_msec=int(steps * 0.05 * 1000))
         self.vehicle_start_pose = BeamNGPose()
 
