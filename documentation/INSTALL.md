@@ -30,7 +30,8 @@ Installing BeamNG.tech is as simple as extracting the files to a target folder i
 
 Please copy the `tech.key` file that you received after registering inside the `<BEAMNG_USER>` folder.
 
-> NOTE: Make sure that `<BEAMNG_HOME>` and `<BEAMNG_USER>` contain no spaces nor special characters. We have observed misbehavior if `<BEAMNG_HOME>` and `<BEAMNG_USER>` are the same folder. Please use different folders.
+> NOTE: Make sure that `<BEAMNG_HOME>` and `<BEAMNG_USER>` contain no spaces nor special characters. 
+> NOTE: Please use different folders for `<BEAMNG_HOME>` and `<BEAMNG_USER>`. We have observed misbehaviors if they are set as the same folder. 
 
 ### Python ###
 
@@ -39,7 +40,7 @@ The code has been developed using Python 3.7. It should run without issues on Py
 ### Other Libraries ###
 
 To easily install the other dependencies with rely on `pip`, we suggest to create a
-dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.7/library/venv.html)),activate it, and upgrade `pip` and basic packages: 
+dedicated virtual environment (we tested [`venv`](https://docs.python.org/3.7/library/venv.html)), activate it, and upgrade `pip` and basic packages: 
 
 ```
 <PYTHON_37_HOME>\python.exe -m venv .venv
