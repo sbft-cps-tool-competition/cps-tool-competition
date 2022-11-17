@@ -18,6 +18,7 @@ from code_pipeline.utils import pairwise
 
 THE_NORTH = [0, 1]
 
+
 ####################################################################################
 # Private Utility Methods
 ####################################################################################
@@ -43,7 +44,7 @@ def _calc_dist_angle(points):
         b = vector(i)
         angle = _calc_angle_distance(a, b)
         distance = np.linalg.norm(b)
-        result[i] = (angle, distance, [points[i+1], points[i]])
+        result[i] = (angle, distance, [points[i + 1], points[i]])
     return result
 
 
@@ -62,12 +63,13 @@ def _define_circle(p1, p2, p3):
         return None, np.inf
 
     # Center of circle
-    cx = (bc*(p2[1] - p3[1]) - cd*(p1[1] - p2[1])) / det
+    cx = (bc * (p2[1] - p3[1]) - cd * (p1[1] - p2[1])) / det
     cy = ((p1[0] - p2[0]) * cd - (p2[0] - p3[0]) * bc) / det
     center = Point(cx, cy)
 
-    radius = np.sqrt((cx - p1[0])**2 + (cy - p1[1])**2)
+    radius = np.sqrt((cx - p1[0]) ** 2 + (cy - p1[1]) ** 2)
     return center, radius
+
 
 ####################################################################################
 # Structural Features
@@ -75,10 +77,35 @@ def _define_circle(p1, p2, p3):
 
 # Measure the coverage of road directions w.r.t. to the North (0,1) using the control points of the given road
 # to approximate the road direction. By default we use 36 bins to have bins of 10 deg each
+def get_thetas(xs, ys, skip=1):
+    """Transform x,y coordinates of points and return each segment's offset from x-axis in the range [np.pi, np.pi]"""
+    xdiffs = xs[1:] - xs[0:-1]
+    ydiffs = ys[1:] - ys[0:-1]
+    thetas = np.arctan2(ydiffs, xdiffs)
+    return thetas
+
+
+# Fixed direction coverage as suggested in Issue #114 by stklk
+def direction_coverage_klk(the_test, n_bins=36):
+    if not isinstance(the_test, list):
+        the_test = the_test.interpolated_points
+    np_arr = np.array(the_test)
+    thetas = get_thetas(np_arr[:, 0], np_arr[:, 1])
+    coverage_buckets = np.linspace(-np.pi, np.pi, num=n_bins)
+    covered_elements = set(np.digitize(thetas, coverage_buckets))
+    dir_coverage = len(covered_elements) / len(coverage_buckets)
+    return "DIR_COV", dir_coverage
+
+
+# Measure the coverage of road directions w.r.t. to the North (0,1) using the control points of the given road
+# to approximate the road direction. By default we use 36 bins to have bins of 10 deg each
 def direction_coverage(the_test, n_bins=25):
     coverage_buckets = np.linspace(0.0, 360.0, num=n_bins + 1)
     direction_list = []
-    for a, b in pairwise(the_test.interpolated_points):
+    if not isinstance(the_test, list):
+        the_test = the_test.interpolated_points
+
+    for a, b in pairwise(the_test):
         # Compute the direction of the segment defined by the two points
         road_direction = [b[0] - a[0], b[1] - a[1]]
         # Compute the angle between THE_NORTH and the road_direction.
@@ -96,8 +123,11 @@ def direction_coverage(the_test, n_bins=25):
 
 
 def max_curvature(the_test, w=5):
+    if not isinstance(the_test, list):
+        nodes = the_test.interpolated_points
+    else:
+        nodes = the_test
     min_radius = np.inf
-    nodes = the_test.interpolated_points
     for i in range(len(nodes) - w):
         p1 = nodes[i]
         p2 = nodes[i + int((w - 1) / 2)]
@@ -111,6 +141,7 @@ def max_curvature(the_test, w=5):
     curvature = 1.0 / min_radius
 
     return "MAX_CURV", curvature
+
 
 ####################################################################################
 # Behavioural Features

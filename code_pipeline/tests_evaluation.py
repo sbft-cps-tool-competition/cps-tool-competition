@@ -4,8 +4,10 @@ from shapely.geometry import Point, LineString
 from shapely.ops import nearest_points
 
 from self_driving.edit_distance_polyline import iterative_levenshtein
-
 from self_driving.simulation_data import SimulationDataRecord
+
+from code_pipeline.test_analysis import direction_coverage, max_curvature
+from code_pipeline.test_analysis import sd_steering, mean_lateral_position, max_lateral_position
 
 from scipy.interpolate import splev, splprep
 
@@ -259,7 +261,7 @@ def _identify_segments(nodes):
 
     segments = list(_road_segments_grouper(segments))
 
-    # Make sure you consider list of points and not triplettes.
+    # Make sure you consider list of points and not triplets.
     for index, segment in enumerate(segments[:]):
         # Replace the element with the merged one
         segments[index] = functools.reduce(lambda a, b: _merge_segments_points(a, b), segment)
@@ -341,9 +343,9 @@ class RoadTestEvaluator:
     roal_length_after_oob
     """
 
-    def __init__(self, road_length_before_oob=BEFORE_THRESHOLD, road_lengrth_after_oob=AFTER_THRESHOLD):
+    def __init__(self, road_length_before_oob=BEFORE_THRESHOLD, road_length_after_oob=AFTER_THRESHOLD):
         self.road_length_before_oob = road_length_before_oob
-        self.road_lengrth_after_oob = road_lengrth_after_oob
+        self.road_length_after_oob = road_length_after_oob
 
     # Note execution data also contains the road
     def identify_interesting_road_segments(self, road_nodes, execution_data):
@@ -355,20 +357,24 @@ class RoadTestEvaluator:
         road_line = LineString([(rp[0], rp[1]) for rp in road_points])
 
         oob_pos = None
+        # This is the index in the record table not the road points
+        oob_idx = None
         # TODO This should be the last observation, so we should iterate the list from the last
         # Assuming we stop the execution at OBE
         positions = []
-        for record in execution_data:
+        for idx, record in enumerate(execution_data):
             positions.append(Point(record.pos[0], record.pos[1]))
             if record.is_oob:
                 oob_pos = Point(record.pos[0], record.pos[1])
+                oob_idx = idx
                 break
 
         if oob_pos == None:
             # No oob, no interesting segments and we cannot tell whether the OOB was left/rigth
-            return None, None, None, None
+            # This happens if the test fails because the car does not move
+            return None, None, None, None, None, None
 
-        # Find the point in the interpolated points that is closes to the OOB position
+        # Find the point in the line string representing the road that is the closest to the OOB position
         # https://stackoverflow.com/questions/24415806/coordinates-of-the-closest-points-of-two-geometries-in-shapely
         np = nearest_points(road_line, oob_pos)[0]
         # Assuming that the road is made by one lane per traffic direction and position are collected frequently,
@@ -386,11 +392,17 @@ class RoadTestEvaluator:
 
         road_coords = list(road_line.coords)
         for i, p in enumerate(road_coords):
-            if Point(p).distance(np) < 0.5:  # Since we interpolate at every meter, whatever is closer than half of if
+            distance = Point(p).distance(np)
+            # Since we interpolate at every meter, whatever is closer than half of if.
+            # But we are deadling with floating points, so we need to account for some tolerance...
+            tolerance = 0.05
+            if distance < 0.5 + tolerance:
                 before = road_coords[0:i]
                 before.append(np.coords[0])
-
                 after = road_coords[i:]
+
+        assert before is not None, "Cannot define segment before OOB"
+        assert after is not None, "Cannot define segment after OOB"
 
         # Take the M meters 'before' the OBE or the entire segment otherwise
         distance = 0
@@ -407,6 +419,46 @@ class RoadTestEvaluator:
             else:
                 temp.insert(0, p2)
 
+
+        # Store the initial position of the before segment
+        start_of_segment = Point(temp[0][0], temp[0][1])
+
+        # Find the execution data state that corresponds to the start of the segment
+        # Here's the thing: the road segment might contain a little more point than execution data because the car is
+        # moved a bit INSIDE the road. When this happens, the initial point of the segment does not correspond to the
+        # initial record in the execution data. There are two strategies to resolve this issue:
+        # 1. Cut the road segment to match the execution data
+        # 2. Leave the road segment as it is and consider all the execution data (default to before_id == 0).
+        # We use the latter strategy here.
+        before_idx = 0
+        #
+        for idx, record in enumerate(execution_data):
+            # Find the point on the road_line closest to position
+            position = Point(record.pos[0], record.pos[1])
+            # plt.plot(position.x, position.y, "+")
+            # This is NOT necessary one of the points defining the line string. So we need to select the one that
+            # is closest to it (0.5 + tol)
+            nearest_points_on_the_road_line = nearest_points(road_line, position)[0]
+            # plt.plot(nearest_points_on_the_road_line.x, nearest_points_on_the_road_line.y, "o")
+
+            for i, p in enumerate(road_coords):
+                distance = Point(p).distance(nearest_points_on_the_road_line)
+                # Since we interpolate at every meter, whatever is closer than half of if.
+                # But we are deadling with floating points, so we need to account for some tolerance...
+                tolerance = 0.05
+                if distance < 0.5 + tolerance:
+                    nearest_points_on_the_road_line = Point(p)
+                    break
+
+            # At this point p is one of the road_points, however, we still use a tolerance around it...
+            # plt.plot(nearest_points_on_the_road_line.x, nearest_points_on_the_road_line.y, "o")
+            # plt.plot(record.pos[0], record.pos[1], "+")
+            if nearest_points_on_the_road_line.distance( start_of_segment ) < 0.01:
+                before_idx = idx
+                break
+
+        assert before_idx is not None, "Cannot find execution data corresponding to start of the interesting segment"
+
         segment_before = LineString(temp)
 
         distance = 0
@@ -418,7 +470,7 @@ class RoadTestEvaluator:
 
             distance += LineString([p1, p2]).length
 
-            if distance >= self.road_lengrth_after_oob:
+            if distance >= self.road_length_after_oob:
                 break
             else:
                 temp.append(p2)
@@ -428,28 +480,28 @@ class RoadTestEvaluator:
         # Identify the road segments from ALL the "interesting part of the road"
         # TODO Why do we need "segments" can't we simply return the (interpolated) road points?
         # interesting_road_segments = _identify_segments(list(segment_before.coords) + list(segment_after.coords))
-        return oob_pos, segment_before, segment_after, oob_side
-
+        execution_before = execution_data[before_idx:oob_idx]
+        return oob_pos, segment_before, segment_after, oob_side, oob_idx, execution_before
 
 class OOBAnalyzer:
     """
         This class implements some analyses on the OOB discovered by a test generator. For the moment,
         we compute similarity of the OOBS using Levenstein distance over the "Interesting" segments
     """
-    def __init__(self, result_folder):
+    def __init__(self, result_folder, road_length_before_oob=30, road_length_after_oob=30):
         self.logger = logging.getLogger('OOBAnalyzer')
-        self.oobs = self._load_oobs_from(result_folder)
+        self.oobs = self._load_oobs_from(result_folder, road_length_before_oob, road_length_after_oob)
 
-    def _load_oobs_from(self, result_folder):
+    def _load_oobs_from(self, result_folder, road_length_before_oob, road_length_after_oob):
 
         # Go over all the files in the result folder and extract the interesing road segments for each OOB
-        road_test_evaluation = RoadTestEvaluator(road_length_before_oob=30, road_lengrth_after_oob=30)
+        road_test_evaluation = RoadTestEvaluator(road_length_before_oob=road_length_before_oob, road_length_after_oob=road_length_after_oob)
 
         oobs = []
         for subdir, dirs, files in os.walk(result_folder, followlinks=False):
             # Consider only the files that match the pattern
             for sample_file in sorted(
-                    [os.path.join(subdir, f) for f in files if f.startswith("test.") and f.endswith(".json")]):
+                    [os.path.join(subdir, f) for f in files if "test." in f and f.endswith(".json")]):
 
                 try:
                     self.logger.debug("Processing test file %s", sample_file)
@@ -464,15 +516,28 @@ class OOBAnalyzer:
                         continue
 
                     # Extract data about OOB, if any
-                    oob_pos, segment_before, segment_after, oob_side = road_test_evaluation.identify_interesting_road_segments(
-                        road_data, execution_data)
+                    oob_pos, segment_before, segment_after, oob_side, oob_idx, execution_before = \
+                        road_test_evaluation.identify_interesting_road_segments(road_data, execution_data)
 
                     # A test might fail also without OOB
                     if oob_pos is None:
                         continue
-                except:
+
+                    interesting_segment = list(segment_before.coords) + list(segment_after.coords)
+                    interesting_execution_data = execution_before
+
+                    assert len(interesting_execution_data) > 0, f"There are not execution data in the interesting segment"
+
+                    dir_cov = direction_coverage(interesting_segment)[1]
+                    max_curv = max_curvature(interesting_segment)[1]
+                    std_sa = sd_steering(interesting_execution_data)[1]
+                    mean_lp = mean_lateral_position(interesting_execution_data)[1]
+                    max_lp = max_lateral_position(interesting_execution_data)[1]
+
+
+                except Exception as e:
                     # Using logger.exception generates logs that are a bit worrysome
-                    self.logger.warning(f"Failed to process OOB for test {sample_file}")
+                    self.logger.warning(f"Failed to process OOB for test {sample_file}. Cause: {e}")
                     oobs.append(
                         {
                             'test id': test_id,
@@ -485,7 +550,13 @@ class OOBAnalyzer:
                             'road segment before oob': None,
                             'road segment after oob': None,
                             # This is the list of points, so we need to extract from LineString objects
-                            'interesting segment': []
+                            'interesting segment': [],
+                            'direction coverage': None,
+                            'maximum curvature': None,
+                            'stdev steering': None,
+                            'mean lateral position': None,
+                            'max lateral position': None,
+
                         }
                     )
                     continue
@@ -502,11 +573,18 @@ class OOBAnalyzer:
                         'road segment before oob': segment_before,
                         'road segment after oob': segment_after,
                         # This is the list of points, so we need to extract from LineString objects
-                        'interesting segment': list(segment_before.coords) + list(segment_after.coords)
+                        'interesting segment': interesting_segment,
+                        'direction coverage': dir_cov,
+                        'maximum curvature': max_curv,
+                        'stdev steering': std_sa,
+                        'mean lateral position': mean_lp,
+                        'max lateral position': max_lp,
                     }
                 )
 
         self.logger.info("Collected data about %d oobs", len(oobs))
+        [self.logger.info(f" - {oob}") for oob in oobs]
+
         return oobs
 
     def _load_test_data(self, execution_data_file):
@@ -518,7 +596,15 @@ class OOBAnalyzer:
             is_valid = json_data["is_valid"]
             if is_valid:
                 test_outcome = json_data["test_outcome"]
+                # Note we default missing values to None
                 execution_data = [SimulationDataRecord(*record) for record in json_data["execution_data"]]
+                # execution_data = []
+                # for idx, record in enumerate(json_data["execution_data"]):
+                # try:
+                #     execution_data.append(SimulationDataRecord(*record))
+                # except Exception as e:
+                #     print(f"Error processing record log {idx}", e)
+
             else:
                 test_outcome = None
                 execution_data = []
@@ -529,7 +615,8 @@ class OOBAnalyzer:
         # Compute distance among the OOB and take the avg of their maximum distance
         max_distances_starting_from = {}
 
-        for (oob1, oob2) in combinations(self.oobs, 2):
+        # Filter only valid oob
+        for (oob1, oob2) in combinations([oob for oob in self.oobs if oob["oob point"] is not None], 2):
             # Compute distance between cells
             distance = iterative_levenshtein(oob1['interesting segment'], oob2['interesting segment'])
             self.logger.debug("Distance of OOB %s from OOB %s is %.3f", oob1["test id"], oob2["test id"], distance)
@@ -584,3 +671,7 @@ class OOBAnalyzer:
         csv_body = "%d,%d,%d,%.3f,%3.f" % (len(self.oobs), *report_data["oob_side"],*report_data["sparseness"])
 
         return "\n".join([csv_header, csv_body])
+
+    def create_oob_report(self):
+        csv_header = "total_oob,left_oob,right_oob,avg_sparseness,stdev_sparseness"
+        csv_body = "%d,%d,%d,%.3f,%3.f" % (len(self.oobs), *report_data["oob_side"], *report_data["sparseness"])

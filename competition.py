@@ -242,15 +242,9 @@ def setup_logging(log_to, debug):
     check_option_is_defined_when_another_is_defined = {
         # If executor is dave2 then the dave2_model becomes mandatory
         ('executor', 'dave2'): ['dave2_model'],
-        # If generation_budget is given then the execution_budget must be given as well
-        ('generation_budget', ANY_NOT_NONE ): ['execution_budget'],
-        # If execution_budget is given then the generation_budget must be given as well
-        ('execution_budget', ANY_NOT_NONE ): ['generation_budget'],
     },
     # Conditionally check that at least one option among the defined is set
-    at_least_one_must_be_defined = [ ['time_budget', 'generation_budget', 'execution_budget'] ],
-    mutually_exclusive = [('time_budget', 'generation_budget'), ('time_budget', 'execution_budget')]
-
+    at_least_one_must_be_defined = [ ['time_budget'] ]
 ))
 @click.option('--executor', type=click.Choice(['mock', 'beamng', 'dave2'], case_sensitive=False), default="mock",
               show_default='Mock Executor (meant for debugging)',
@@ -266,15 +260,9 @@ def setup_logging(log_to, debug):
                    "where levels, props, and other BeamNG-related data will be copied."
                    "** Use this to avoid spaces in URL/PATHS! **")
 # Budgeting options
-@click.option('--generation-budget', required=False, default=DEFAULT, callback=validate_optional_time_budget,
-              help="Time budget for the test generation. Expressed in 'real-time' seconds.")
-@click.option('--execution-budget', required=False, default=DEFAULT, callback=validate_optional_time_budget,
-              help="Time budget for the test execution. Expressed in 'simulated-time' seconds.")
 @click.option('--time-budget', required=False, default=DEFAULT, callback=validate_optional_time_budget,
               help="Overall budget for the generation and execution. Expressed in 'real-time'"
-                   "seconds. This option is here to be back-ward compatible and will take "
-                   "precedence over generation-budget and execution-budget")
-
+                   "seconds.")
 @click.option('--map-size', type=int, default=200, callback=validate_map_size,
               show_default='200m, which leads to a 200x200m^2 squared map',
               help="The lenght of the size of the squared map where the road must fit."
@@ -306,7 +294,7 @@ def setup_logging(log_to, debug):
               help="Activate debugging (results in more logging)")
 @click.pass_context
 def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
-             generation_budget, execution_budget, time_budget,
+             time_budget,
              map_size, oob_tolerance, speed_limit,
              module_name, module_path, class_name,
              visualize_tests, log_to, debug):
@@ -360,23 +348,19 @@ def generate(ctx, executor, dave2_model, beamng_home, beamng_user,
     if executor == "mock":
         from code_pipeline.executors import MockExecutor
         the_executor = MockExecutor(result_folder, map_size,
-                                    generation_budget=generation_budget, execution_budget=execution_budget,
                                     time_budget=time_budget,
                                     road_visualizer=road_visualizer)
     elif executor == "beamng":
         from code_pipeline.beamng_executor import BeamngExecutor
         the_executor = BeamngExecutor(result_folder, map_size,
-                                      generation_budget=generation_budget, execution_budget=execution_budget,
                                       time_budget=time_budget,
                                       oob_tolerance=oob_tolerance, max_speed_in_kmh=speed_limit,
                                       beamng_home=beamng_home, beamng_user=beamng_user,
                                       road_visualizer=road_visualizer)
 
-    #     def __init__(self, result_folder, map_size, dave2_model,
     elif executor == "dave2":
         from code_pipeline.dave2_executor import Dave2Executor
         the_executor = Dave2Executor(result_folder, map_size, dave2_model,
-                                     generation_budget=generation_budget, execution_budget=execution_budget,
                                      time_budget=time_budget,
                                      oob_tolerance=oob_tolerance, max_speed=speed_limit,
                                      beamng_home=beamng_home, beamng_user=beamng_user,

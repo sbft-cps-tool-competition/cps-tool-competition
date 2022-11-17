@@ -20,7 +20,8 @@ class RandomTestGenerator():
 
         while not self.executor.is_over():
             # Some debugging
-            log.info(f"Starting test generation. Remaining time {self.executor.get_remaining_time()}")
+            time_remaining = self.executor.get_remaining_time()["time-budget"]
+            log.info(f"Starting test generation. Remaining time {time_remaining}")
 
             # Simulate the time to generate a new test
             sleep(0.5)
@@ -34,10 +35,12 @@ class RandomTestGenerator():
             # Decorate the_test object with the id attribute
             the_test = RoadTestFactory.create_road_test(road_points)
 
-            log.info(f"Simulated test generation for 0.5 sec. Remaining time {self.executor.get_remaining_time()}")
+            time_remaining = self.executor.get_remaining_time()["time-budget"]
+            log.info(f"Simulated test generation for 0.5 sec. Remaining time {time_remaining}")
             # Try to execute the test
             test_outcome, description, execution_data = self.executor.execute_test(the_test)
-            log.info(f"Executed test {the_test.id}. Remaining time {self.executor.get_remaining_time()}")
+            time_remaining = self.executor.get_remaining_time()["time-budget"]
+            log.info(f"Executed test {the_test.id}. Remaining time {time_remaining}")
 
             # Print the result from the test and continue
             log.info("test_outcome %s", test_outcome)

@@ -59,6 +59,35 @@ class RoadPoints:
         r = origin + np.array([v[1], -v[0]])
         return tuple(l), tuple(r)
 
+    @staticmethod
+    def angle_to_quat(angle: Tuple[float, float, float]) -> Tuple[float, float, float, float]:
+        """
+        FIXME: copied from previous version of BeamNGpy
+        Converts an euler angle to a quaternion.
+
+        Args:
+            angle (tuple): Euler angle (degrees)
+
+        Return:
+            Quaterion with the order (x, y, z, w) with w representing the real
+            component
+        """
+        angle = np.radians(angle)
+
+        cy = np.cos(angle[2] * 0.5)
+        sy = np.sin(angle[2] * 0.5)
+        cp = np.cos(angle[1] * 0.5)
+        sp = np.sin(angle[1] * 0.5)
+        cr = np.cos(angle[0] * 0.5)
+        sr = np.sin(angle[0] * 0.5)
+
+        w = cr * cp * cy + sr * sp * sy
+        x = sr * cp * cy - cr * sp * sy
+        y = cr * sp * cy + sr * cp * sy
+        z = cr * cp * sy - sr * sp * cy
+
+        return x, y, z, w
+
     def vehicle_start_pose(self, meters_from_road_start=2.5, road_point_index=0) \
             -> BeamNGPose:
         assert self.n > road_point_index, f'road length is {self.n} it does not have index {road_point_index}'
@@ -70,7 +99,9 @@ class RoadPoints:
         v = (p2v / np.linalg.norm(p2v)) * meters_from_road_start
         origin = np.add(p1[0:2], p1r[0:2]) / 2
         deg = np.degrees(np.arctan2([-v[0]], [-v[1]]))
-        res = BeamNGPose(pos=tuple(origin + v) + (p1[2],), rot=(0, 0, deg[0]))
+        angle = (0, 0, deg[0])
+        rot = self.angle_to_quat(angle=angle)
+        res = BeamNGPose(pos=tuple(origin + v) + (p1[2],), rot=rot)
         return res
 
     def new_imagery(self):

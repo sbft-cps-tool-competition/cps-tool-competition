@@ -1,3 +1,5 @@
+import subprocess
+
 from code_pipeline.executors import AbstractTestExecutor
 
 import time
@@ -23,16 +25,11 @@ FloatDTuple = Tuple[float, float, float, float]
 class BeamngExecutor(AbstractTestExecutor):
 
     def __init__(self, result_folder, map_size,
-                 generation_budget=None, execution_budget=None, time_budget=None,
+                 time_budget=None,
                  oob_tolerance=0.95, max_speed_in_kmh=70,
                  beamng_home=None, beamng_user=None, road_visualizer=None, debug=False):
         super(BeamngExecutor, self).__init__(result_folder, map_size,
-                                             generation_budget=generation_budget, execution_budget=execution_budget,
                                              time_budget=time_budget, debug=debug)
-
-        # TODO Is this still valid?
-        # self.test_time_budget = 250000
-
 
         # TODO This is specific to the TestSubject, we should encapsulate this better
         self.risk_value = 0.7
@@ -43,10 +40,11 @@ class BeamngExecutor(AbstractTestExecutor):
         self.brewer: BeamNGBrewer = None
         self.beamng_home = beamng_home
         self.beamng_user = beamng_user
+        assert self.beamng_user is not None, "Please provide a --beamng-user folder"
 
         # TODO Add checks with default setup. This requires a call to BeamNGpy resolve  (~/Documents/BeamNG.research)
-        if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
-            log.warning("%s is missing but is required to use BeamNG.research", )
+        # if self.beamng_user is not None and not os.path.exists(os.path.join(self.beamng_user, "research.key")):
+        #     log.warning("%s is missing but is required to use BeamNG.research", )
 
         # Runtime Monitor about relative movement of the car
         self.last_observation = None
@@ -129,7 +127,7 @@ class BeamngExecutor(AbstractTestExecutor):
         # Override default configuration passed via ENV or hardcoded
         if self.beamng_user is not None:
             # Note This changed since BeamNG.research
-            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.24', 'levels'))
+            beamng_levels = LevelsFolder(os.path.join(self.beamng_user, '0.26', 'levels'))
             maps.beamng_levels = beamng_levels
             maps.beamng_map = maps.beamng_levels.get_map('tig')
             # maps.print_paths()
@@ -137,7 +135,7 @@ class BeamngExecutor(AbstractTestExecutor):
         maps.install_map_if_needed()
         maps.beamng_map.generated().write_items(brewer.decal_road.to_json() + '\n' + waypoint_goal.to_json())
 
-        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng, additional_sensors=None)
+        vehicle_state_reader = VehicleStateReader(self.vehicle, beamng)
         brewer.vehicle_start_pose = brewer.road_points.vehicle_start_pose()
 
         steps = brewer.params.beamng_steps
@@ -152,13 +150,8 @@ class BeamngExecutor(AbstractTestExecutor):
 
         sim_data_collector.get_simulation_data().start()
 
-        # TODO Make brewer a context manager that automatically closes everything
-
         try:
-            #start = timeit.default_timer()
             brewer.bring_up()
-            # iterations_count = int(self.test_time_budget/250)
-            # idx = 0
 
             brewer.vehicle.ai_set_aggression(self.risk_value)
             #  Sets the target speed for the AI in m/s, limit means this is the maximum value (not the reference one)
@@ -167,8 +160,6 @@ class BeamngExecutor(AbstractTestExecutor):
             brewer.vehicle.ai_set_waypoint(waypoint_goal.name)
 
             while True:
-                # idx += 1
-                # assert idx < iterations_count, "Timeout Simulation " + str(sim_data_collector.name)
 
                 sim_data_collector.collect_current_data(oob_bb=True)
                 last_state: SimulationDataRecord = sim_data_collector.states[-1]
@@ -176,19 +167,15 @@ class BeamngExecutor(AbstractTestExecutor):
                 if points_distance(last_state.pos, waypoint_goal.position) < 8.0:
                     break
 
-                assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(sim_data_collector.name)
+                assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(
+                    sim_data_collector.name)
 
-                assert not last_state.is_oob, "Car drove out of the lane " + str(sim_data_collector.name)
+                assert not last_state.is_oob, "Car drove out of the lane " + str(self.sim_data_collector.name)
 
-                beamng.step(steps)
+                beamng.step(steps, wait=False)
 
             sim_data_collector.get_simulation_data().end(success=True)
-            #end = timeit.default_timer()
-            #run_elapsed_time = end-start
-            #run_elapsed_time = float(last_state.timer)
-            # self.total_elapsed_time = self.get_elapsed_time()
         except AssertionError as aex:
-            sim_data_collector.save()
             # An assertion that trigger is still a successful test execution, otherwise it will count as ERROR
             sim_data_collector.get_simulation_data().end(success=True, exception=aex)
             traceback.print_exception(type(aex), aex, aex.__traceback__)
@@ -203,7 +190,7 @@ class BeamngExecutor(AbstractTestExecutor):
             except:
                 pass
 
-            self.end_iteration()
+            self._close()
 
         return sim_data_collector.simulation_data
 
@@ -217,7 +204,13 @@ class BeamngExecutor(AbstractTestExecutor):
     def _close(self):
         if self.brewer:
             try:
-                self.brewer.beamng.close()
+                self.brewer.beamng.scenario.close()
+
+                beamng_program_name = "BeamNG.tech.x64"
+                cmd = "taskkill /IM \"{}.exe\" /F".format(beamng_program_name)
+                ret = subprocess.check_output(cmd)
+
+                output_str = ret.decode("utf-8")
             except Exception as ex:
                 traceback.print_exception(type(ex), ex, ex.__traceback__)
             self.brewer = None

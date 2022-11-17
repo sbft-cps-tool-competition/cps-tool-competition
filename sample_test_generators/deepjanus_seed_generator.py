@@ -19,6 +19,7 @@ from self_driving.road_polygon import RoadPolygon
 Tuple4F = Tuple[float, float, float, float]
 Tuple2F = Tuple[float, float]
 
+
 def catmull_rom_spline(p0, p1, p2, p3, num_points=20):
     """p0, p1, p2, and p3 should be (x,y) point pairs that define the Catmull-Rom spline.
     num_points is the number of points to include in this curve segment."""
@@ -107,7 +108,7 @@ class RoadGenerator:
         self.seg_length = seg_length
         self.road_bbox = RoadBoundingBox(bbox_size)
         assert not self.road_bbox.intersects_vertices(self._get_initial_point())
-        #assert self.road_bbox.intersects_sides(self._get_initial_point())
+        # assert self.road_bbox.intersects_sides(self._get_initial_point())
 
     def generate_control_nodes(self, attempts=NUM_UNDO_ATTEMPTS) -> List[Tuple4F]:
         condition = True
@@ -132,7 +133,8 @@ class RoadGenerator:
                 assert budget >= 1
 
                 intersect_boundary = self.road_bbox.intersects_boundary(road_polygon.polygons[-1])
-                is_valid = road_polygon.is_valid() and (((i==0) and intersect_boundary) or ((i>0) and not intersect_boundary))
+                is_valid = road_polygon.is_valid() and (
+                            ((i == 0) and intersect_boundary) or ((i > 0) and not intersect_boundary))
                 while not is_valid and budget > 0:
                     nodes.pop()
                     budget -= 1
@@ -143,7 +145,7 @@ class RoadGenerator:
 
                     intersect_boundary = self.road_bbox.intersects_boundary(road_polygon.polygons[-1])
                     is_valid = road_polygon.is_valid() and (
-                                ((i == 0) and intersect_boundary) or ((i > 0) and not intersect_boundary))
+                            ((i == 0) and intersect_boundary) or ((i > 0) and not intersect_boundary))
 
                 if is_valid:
                     i += 1
@@ -185,7 +187,7 @@ class RoadGenerator:
     def _get_initial_control_node(self) -> Tuple4F:
         x0, y0, z, width = self.initial_node
         x, y = self._get_next_xy(x0, y0, 270)
-        assert not(self.road_bbox.bbox.contains(Point(x, y)))
+        assert not (self.road_bbox.bbox.contains(Point(x, y)))
 
         return x, y, z, width
 
@@ -227,7 +229,6 @@ class JanusGenerator():
 
         # while(test_outcome != "FAIL"):
         while not self.executor.is_over():
-
             road_points = RoadGenerator(num_control_nodes=NODES, max_angle=MAX_ANGLE, seg_length=SEG_LENGTH,
                                  num_spline_nodes=NUM_SPLINE_NODES).generate()
 
@@ -236,9 +237,9 @@ class JanusGenerator():
 
             test_outcome, description, execution_data = self.executor.execute_test(the_test)
 
-            log.info(test_outcome, description)
+            log.info("Test outcome: {}. Description: {}".format(test_outcome, description))
             count += 1
-            log.info("Remaining Time: %s", str(self.executor.get_remaining_time()))
+            log.info("Remaining Time: %s", str(self.executor.get_remaining_time()["time-budget"]))
 
             log.info("Successful tests: %s", str(count))
 
@@ -250,6 +251,7 @@ if __name__ == "__main__":
     beamng_home = r"C:\Users\vinni\bng_competition\BeamNG.research.v1.7.0.0"
 
     from code_pipeline.beamng_executor import BeamngExecutor
+
     executor = BeamngExecutor(time_budget=time_budget, map_size=map_size, beamng_home=beamng_home)
 
     roadgen = JanusGenerator(time_budget, executor, map_size)

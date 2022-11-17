@@ -12,7 +12,7 @@ VehicleState = namedtuple('VehicleState', VehicleStateProperties)
 
 
 class VehicleStateReader:
-    def __init__(self, vehicle: Vehicle, beamng: BeamNGpy, additional_sensors: List[Tuple[str, Sensor]] = None):
+    def __init__(self, vehicle: Vehicle, beamng: BeamNGpy):
         self.vehicle = vehicle
 
         self.beamng = beamng
@@ -21,7 +21,7 @@ class VehicleStateReader:
 
         #assert 'state' in self.vehicle.sensors.keys(), "Default state sensor is missing"
         # Starting from BeamNG.tech 0.23.5_1 once the scenario is over a vehicle's sensors get automatically detached
-        # Including the defatul state sensor... so we need to ensure that is there somehow, or stop reusing the vehicle
+        # Including the default state sensor so we need to ensure that is there somehow, or stop reusing the vehicle
         # object across simulations
         try:
             state = State()
@@ -29,16 +29,11 @@ class VehicleStateReader:
         except:
             pass
 
-
         electrics = Electrics()
         timer = Timer()
 
         self.vehicle.attach_sensor('electrics', electrics)
         self.vehicle.attach_sensor('timer', timer)
-
-        if additional_sensors:
-            for (name, sensor) in additional_sensors:
-                self.vehicle.attach_sensor(name, sensor)
 
     def get_state(self) -> VehicleState:
         return self.state
@@ -47,22 +42,21 @@ class VehicleStateReader:
         return self.vehicle.get_bbox()
 
     def update_state(self):
-        sensors = self.beamng.poll_sensors(self.vehicle)
-        self.sensors = sensors
+        self.vehicle.poll_sensors()
 
-        st = sensors['state']
-        ele = sensors['electrics']
+        st = self.vehicle.sensors['state']
+        ele = self.vehicle.sensors['electrics']
         vel = tuple(st['vel'])
 
-        self.state = VehicleState(timer=sensors['timer']['time']
+        self.state = VehicleState(timer=self.vehicle.sensors['timer'].data['time']
                                   , pos=tuple(st['pos'])
                                   , dir=tuple(st['dir'])
                                   , vel=vel
-                                  , steering=ele.get('steering', None)
-                                  , steering_input=ele.get('steering_input', None)
-                                  , brake=ele.get('brake', None)
-                                  , brake_input=ele.get('brake_input', None)
-                                  , throttle=ele.get('throttle', None)
-                                  , throttle_input=ele.get('throttle_input', None)
-                                  , wheelspeed=ele.get('wheelspeed', None)
+                                  , steering=ele.data.get('steering', None)
+                                  , steering_input=ele.data.get('steering_input', None)
+                                  , brake=ele.data.get('brake', None)
+                                  , brake_input=ele.data.get('brake_input', None)
+                                  , throttle=ele.data.get('throttle', None)
+                                  , throttle_input=ele.data.get('throttle_input', None)
+                                  , wheelspeed=ele.data.get('wheelspeed', None)
                                   , vel_kmh=int(round(np.linalg.norm(vel) * 3.6)))

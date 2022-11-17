@@ -21,7 +21,8 @@ SimulationDataRecords = List[SimulationDataRecord]
 
 SimulationParams = namedtuple('SimulationParameters', ['beamng_steps', 'delay_msec'])
 
-def delete_folder_recursively(path: Union[str, Path], exception_if_fail: bool = True):
+
+def delete_folder_recursively(path: Union[str, Path]):
     path = str(path)
     if not os.path.exists(path):
         return
@@ -60,7 +61,7 @@ class SimulationData:
 
     def __init__(self, simulation_name: str):
         self.name = simulation_name
-        root: Path = Path(os.path.abspath(os.path.join(os.path.dirname(__file__),'..')))
+        root: Path = Path(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
         self.simulations: Path = root.joinpath('simulations')
         self.path_root: Path = self.simulations.joinpath(simulation_name)
         self.path_json: Path = self.path_root.joinpath('simulation.full.json')
@@ -92,6 +93,14 @@ class SimulationData:
 
     def clean(self):
         delete_folder_recursively(self.path_root)
+
+    def __str__(self) -> str:
+        return json.dumps({
+            self.f_params: self.params._asdict(),
+            self.f_info: self.info.__dict__,
+            self.f_road: self.road.to_dict(),
+            self.f_records: [r._asdict() for r in self.states]
+        })
 
     def save(self):
         self.path_root.mkdir(parents=True, exist_ok=True)
@@ -127,23 +136,6 @@ class SimulationData:
             [SimulationDataRecord(**r) for r in obj[self.f_records]],
             info=info)
         return self
-
-    @staticmethod
-    def load_from_json(path_json):
-        with open(path_json, 'r') as f:
-            obj = json.loads(f.read())
-        info = SimulationInfo()
-
-        info.__dict__ = obj.get(self.f_info, {})
-        self.set(
-            SimulationParams(**obj[self.f_params]),
-            DecalRoad.from_dict(obj[self.f_road]),
-            [SimulationDataRecord(**r) for r in obj[self.f_records]],
-            info=info)
-        return self
-
-        pass
-
 
     def complete(self) -> bool:
         return self.path_json.exists()
