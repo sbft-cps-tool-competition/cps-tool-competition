@@ -1,6 +1,8 @@
 # Cyber-Physical Systems Testing Tool Competition #
 The [SBFT Workshop](https://sbft23.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbft23.github.io/tools/).
 
+‼️ 12.12.2022: The repository has been updated to fix a bug where out-of-bound events were incorrectly counted with the BeamNG.AI driver.
+
 ## Important Dates
 The deadline to submit your tool is: **January 13st 2023**
 
