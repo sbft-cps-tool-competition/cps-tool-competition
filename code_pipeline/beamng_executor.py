@@ -170,7 +170,7 @@ class BeamngExecutor(AbstractTestExecutor):
                 assert self._is_the_car_moving(last_state), "Car is not moving fast enough " + str(
                     sim_data_collector.name)
 
-                assert not last_state.is_oob, "Car drove out of the lane " + str(self.sim_data_collector.name)
+                assert not last_state.is_oob, "Car drove out of the lane " + str(sim_data_collector.name)
 
                 beamng.step(steps, wait=False)
 
