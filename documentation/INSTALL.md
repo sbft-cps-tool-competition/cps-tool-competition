@@ -24,14 +24,15 @@ copy of BeamNG.tech
 > **Note**: As stated on the BeamNG registration page, **please use your university email address**. 
 If you do not own a university email address, please contact the organizers of the tool competition. 
 
-For the competition we use `BeamNG.tech v0.26.1.0`, please make sure you download exactly this version of the simulator, i.e., file `BeamNG.tech.v0.26.1.0.zip`.
+For the competition we use `BeamNG.tech v0.26.2.0`, please make sure you download exactly this version of the simulator, i.e., file `BeamNG.tech.v0.26.2.0.zip`.
 
-Installing BeamNG.tech is as simple as extracting the files to a target folder in your system (e.g., `C:\BeamNG.tech.v0.26.1.0`). We call this folder `<BEAMNG_HOME>`. Additionally you need to create another folder (e.g., `C:\BeamNG.tech.v0.26.1.0_userpath`) that will act as BeamNG.tech working dir. BeamNG.tech will copy in this directory the levels and its cache. We call this folder `<BEAMNG_USER>`.
+Installing BeamNG.tech is as simple as extracting the files to a target folder in your system (e.g., `C:\BeamNG.tech.v0.26.2.0`). We call this folder `<BEAMNG_HOME>`. Additionally you need to create another folder (e.g., `C:\BeamNG.tech.v0.26.2.0_userpath`) that will act as BeamNG.tech working dir. BeamNG.tech will copy in this directory the levels and its cache. We call this folder `<BEAMNG_USER>`.
 
 Please copy the `tech.key` file that you received after registering inside the `<BEAMNG_USER>` folder.
 
 > NOTE: Make sure that `<BEAMNG_HOME>` and `<BEAMNG_USER>` contain no spaces nor special characters. 
 > NOTE: Please use different folders for `<BEAMNG_HOME>` and `<BEAMNG_USER>`. We have observed misbehaviors if they are set as the same folder. 
+> NOTE: Our pipeline supports also the previous simulator version, i.e., `BeamNG.tech v0.26.1.0`. 
 
 ### Python ###
 
