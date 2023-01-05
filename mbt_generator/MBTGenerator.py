@@ -16,6 +16,7 @@ from scipy.interpolate import splev, splprep
 from numpy.ma import arange
 from shapely.geometry import LineString
 import subprocess
+import shutil
 
 
 def read_points_from_csv(filename):
@@ -28,9 +29,30 @@ def read_points_from_csv(filename):
     print(list_of_rows)
     return list_of_rows
 
+def read_params_from_csv(filename):
+    params = []
+    print(filename)
+    with open(filename, 'r') as f:
+        for line in f:
+            values = line.strip().split(",")
+            param_name = values[0]
+            param_value = values[1]
+            if param_value == "":
+                params.append("-" + param_name)
+            else:
+                params.append("-" + param_name + "=" + param_value)
+    print(params)
+    return params
 
-def get_tests(tests_dir):
-    return glob.glob(os.path.join(tests_dir, '*.csv'))
+def clean(mbt_files_path):
+    #delete existing mbt-files folder
+    shutil.rmtree(mbt_files_path, ignore_errors=True)
+    print("removed " + mbt_files_path)
+
+
+def get_tests():
+    tests_dir = r'mbt_generator/mbt-files/tests/**/test_*.csv'
+    return glob.glob(tests_dir, recursive=True)
 
 
 class MBTGenerator:
@@ -42,26 +64,35 @@ class MBTGenerator:
         self.executor = executor
         self.map_size = map_size
 
-    def run_mbt(self, generation_budget, map_size, tests_dir):
-        import os
+    def run_mbt(self, generation_budget, map_size):
+        mbt_path = "mbt_generator"
         folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        jar_file = os.path.join(folder, 'mbt-1.0.2-jar-with-dependencies.jar')
+        jar_file = os.path.join(folder, mbt_path, 'EvoMBT-1.2.0-jar-with-dependencies.jar')
         print(f"Jar File {jar_file}")
-        subprocess.call(['java', '-jar', jar_file, str(generation_budget), str(map_size), tests_dir])
+        params = read_params_from_csv(os.path.join(folder, mbt_path, "params.csv"))
+        print(params)
+        all_params = ['java', '-jar', '-Dsearch_budget=' + str(generation_budget), jar_file] + params
+        print(all_params)
+        # subprocess.call(['java', '-jar', jar_file, str(generation_budget), str(map_size), tests_dir])
+
+        # remove existing files
+        mbt_files_dir = "mbt-files"
+        clean(os.path.join(folder, mbt_path, mbt_files_dir))
+        subprocess.call(all_params)
 
     def start(self):
         # temporary directory where MBT writes tests
-        tests_dir = 'tmp_mbt'
 
-        generation_budget = self.executor.get_remaining_time()["generation-budget"]
+
+        generation_budget = self.executor.get_remaining_time()["time-budget"]
         # proportion represents the percentage of the generation-budget
         # to be used by MBT for test generation
         proportion = 0.8
         mbt_generation_budget = int(generation_budget * proportion)
         log.info("Starting test generation using MBT with generation budget %i ...", mbt_generation_budget)
-        self.run_mbt(mbt_generation_budget, self.map_size, tests_dir)
+        self.run_mbt(mbt_generation_budget, self.map_size)
 
-        test_files = get_tests(tests_dir)
+        test_files = get_tests()
         total_tests = len(test_files)
         log.info("MBT generated %s tests with budget %i", total_tests, mbt_generation_budget)
 
