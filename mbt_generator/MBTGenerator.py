@@ -29,9 +29,10 @@ def read_points_from_csv(filename):
     print(list_of_rows)
     return list_of_rows
 
-def read_params_from_csv(filename):
+
+def read_params_from_csv():
+    filename = os.path.join(get_mbt_root_path(), "params.csv")
     params = []
-    print(filename)
     with open(filename, 'r') as f:
         for line in f:
             values = line.strip().split(",")
@@ -44,15 +45,44 @@ def read_params_from_csv(filename):
     print(params)
     return params
 
-def clean(mbt_files_path):
-    #delete existing mbt-files folder
+
+def clean_mbt_files():
+    # delete existing mbt-files folder
+    mbt_files_path = get_mbt_files_path();
+    print("mbt-files: " + mbt_files_path)
     shutil.rmtree(mbt_files_path, ignore_errors=True)
     print("removed " + mbt_files_path)
 
 
 def get_tests():
-    tests_dir = r'mbt_generator/mbt-files/tests/**/test_*.csv'
+    # tests_dir = r'mbt_generator/mbt-files/tests/**/test_*.csv'
+    tests_dir = get_mbt_files_path() + "/" + "tests/**/test_*.csv"
     return glob.glob(tests_dir, recursive=True)
+
+
+def get_mbt_files_path():
+    return os.path.join(get_mbt_root_path(), "mbt-files")
+
+
+def get_mbt_root_path():
+    return os.path.dirname(os.path.realpath(__file__))
+
+
+def run_mbt(generation_budget, map_size):
+    #mbt_path = "mbt_generator"
+    #folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
+    jar_file = os.path.join(get_mbt_root_path(), 'EvoMBT-1.2.1-jar-with-dependencies.jar')
+    print(f"Jar File {jar_file}")
+    params = read_params_from_csv()
+    print(params)
+    all_params = ['java', '-jar', '-Dsearch_budget=' + str(generation_budget), jar_file] + params
+    print(all_params)
+
+    # remove existing files
+    clean_mbt_files()
+
+    # run EvoMBT
+    subprocess.call(all_params)
 
 
 class MBTGenerator:
@@ -64,33 +94,15 @@ class MBTGenerator:
         self.executor = executor
         self.map_size = map_size
 
-    def run_mbt(self, generation_budget, map_size):
-        mbt_path = "mbt_generator"
-        folder = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
-        jar_file = os.path.join(folder, mbt_path, 'EvoMBT-1.2.0-jar-with-dependencies.jar')
-        print(f"Jar File {jar_file}")
-        params = read_params_from_csv(os.path.join(folder, mbt_path, "params.csv"))
-        print(params)
-        all_params = ['java', '-jar', '-Dsearch_budget=' + str(generation_budget), jar_file] + params
-        print(all_params)
-        # subprocess.call(['java', '-jar', jar_file, str(generation_budget), str(map_size), tests_dir])
-
-        # remove existing files
-        mbt_files_dir = "mbt-files"
-        clean(os.path.join(folder, mbt_path, mbt_files_dir))
-        subprocess.call(all_params)
-
     def start(self):
         # temporary directory where MBT writes tests
-
-
         generation_budget = self.executor.get_remaining_time()["time-budget"]
         # proportion represents the percentage of the generation-budget
         # to be used by MBT for test generation
         proportion = 0.8
         mbt_generation_budget = int(generation_budget * proportion)
         log.info("Starting test generation using MBT with generation budget %i ...", mbt_generation_budget)
-        self.run_mbt(mbt_generation_budget, self.map_size)
+        run_mbt(mbt_generation_budget, self.map_size)
 
         test_files = get_tests()
         total_tests = len(test_files)
