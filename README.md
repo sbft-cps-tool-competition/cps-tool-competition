@@ -4,7 +4,7 @@ The [SBFT Workshop](https://sbft23.github.io/) offers a challenge for software t
 ‼️ 12.12.2022: The repository has been updated to fix a bug where out-of-bound events were incorrectly counted with the BeamNG.AI driver.
 
 ## Important Dates
-The deadline to submit your tool is: **January 13th 2023**
+The deadline to submit your tool is: ~~**January 13th 2023**~~ **January 20th 2023**
 
 The results of the evaluation will be communicated to participants on: **February 21st 2023**
 
