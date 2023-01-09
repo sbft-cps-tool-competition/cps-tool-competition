@@ -1,0 +1,6 @@
+sbt,
+Dsut_efsm,cps.beamng_custom_model
+Doutput_dir,mbt_generator\mbt-files
+Dmodelcriterion,KTRANSITION
+Dk_transition_size,2
+Dalgorithm,MOSA

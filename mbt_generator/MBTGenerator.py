@@ -121,7 +121,7 @@ class MBTGenerator:
         generation_budget = self.executor.get_remaining_time()["time-budget"]
         # proportion represents the percentage of the generation-budget
         # to be used by MBT for test generation
-        proportion = 0.8
+        proportion = 0.1
         mbt_generation_budget = int(generation_budget * proportion)
         log.info("Starting test generation using MBT with generation budget %i ...", mbt_generation_budget)
         run_mbt(mbt_generation_budget, self.map_size)
@@ -132,6 +132,7 @@ class MBTGenerator:
 
         test_number = 0
         cnt_invalid = 0
+
         while not self.executor.is_over() and test_number < total_tests:
             log.info(f"Starting test execution. Remaining time {self.executor.get_remaining_time()}")
             log.info("Test %i", test_number+1)
@@ -140,7 +141,7 @@ class MBTGenerator:
             if self.invalid(road_points, self.map_size):
                 test_number += 1
                 cnt_invalid += 1
-                # for debugging purpose comment continue and compare with competition check
+                 # for debugging purpose comment continue and compare with competition check
                 continue
 
             # Some more debugging
@@ -211,7 +212,7 @@ class MBTGenerator:
 
             new_x_vals, new_y_vals = splev(unew, pos_tck)
 
-            # Return the 4-tuple with default z and defatul road width
+            # Return the 4-tuple with default z and default road width
             return list(zip([round(v, rounding_precision) for v in new_x_vals],
                             [round(v, rounding_precision) for v in new_y_vals],
                             [-28.0 for v in new_x_vals],
@@ -277,8 +278,28 @@ class MBTGenerator:
                    0 < max_y or max_y > self.map_size and the_test.get_road_length() > 20
 
         # return RoadPolygon.from_nodes(_interpolate(road_points)).is_valid()
-        return road_bbox.intersects_boundary(RoadPolygon.from_nodes(_interpolate(road_points)).polygon) \
-               or not RoadPolygon.from_nodes(_interpolate(road_points)).is_valid() \
-               or not is_inside_map(_interpolate(road_points)) \
-               or is_too_sharp(_interpolate(road_points)) \
-               or is_too_short(road_points)
+
+        if is_too_short(road_points):
+            log.info("Too short")
+            return True
+        if is_too_sharp(_interpolate(road_points)):
+            log.info("Too sharp")
+            return True
+        if not RoadPolygon.from_nodes(_interpolate(road_points)).is_valid():
+            log.info("Not a path")
+            return True
+        if not is_inside_map(_interpolate(road_points)):
+            log.info("Outside map")
+            return True
+        if road_bbox.intersects_boundary(RoadPolygon.from_nodes(_interpolate(road_points)).polygon):
+            log.info("Intersect boundary")
+            return True
+        return False
+
+
+
+        # return road_bbox.intersects_boundary(RoadPolygon.from_nodes(_interpolate(road_points)).polygon) \
+        #        or not RoadPolygon.from_nodes(_interpolate(road_points)).is_valid() \
+        #        or not is_inside_map(_interpolate(road_points)) \
+        #        or is_too_sharp(_interpolate(road_points)) \
+        #        or is_too_short(road_points)
