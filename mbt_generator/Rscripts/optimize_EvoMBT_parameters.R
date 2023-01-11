@@ -13,7 +13,7 @@ setwd(competition_folder)
 # time budget for a run (in 2022 total time was 2h)
 time_budget = 3600
 # number of replicas
-n_replica <- 5
+n_replica <- 2
 # oob tollerance (Value used in 2022 competition)
 oob_tol <- 0.85
 # competition script
@@ -44,7 +44,7 @@ colnames(basic_par) <- c("var","value")
 ## Function to optimize is the number of oob. The function call competition.py and read the number of oob
 ##beamng_n_directions <- 16
 ##beamng_max_angle <- 80
-#par <- c(8, 45,20,28,5)
+par <- c(8, 45,20,20,10,100)
 compute_oob <- function(par){
   
   ## set wd
@@ -108,10 +108,10 @@ compute_oob <- function(par){
 
 ## define initial parameters and boundaries
 par_names = c("Dbeamng_n_directions","Dbeamng_max_angle",
-              "Dbeamng_min_street_length","Dbeamng_max_street_length","Dbeamng_street_chunck_length")
-initial_par <- c(24, 45,15,30,15)
-min_par <- c(8, 15, 10, 20, 5)
-max_par <- c(45, 60, 20, 40, 15)
+              "Dbeamng_min_street_length","Dbeamng_max_street_length","Dbeamng_street_chunck_length","Dbeamng_min_radius")
+initial_par <- c(8, 45,20,20,10,20)
+min_par <- c(8, 15, 10, 20, 5,5)
+max_par <- c(45, 60, 20, 40, 15,20)
 names(initial_par) <- par_names
 
 ## Create report empty report
@@ -127,13 +127,12 @@ fwrite(report, report_file, quote = F, append = F, sep = ",", row.names = F, col
 # Evaluate the time required
 
 # Uncomment to apply gradient based optimization
-# opt <- optimx(par = initial_par, fn = compute_oob, method = "L-BFGS-B",lower = min_par, upper = max_par, itnmax = 5,
-#              control = list(trace = 0, all.methods = FALSE,
-#                             ndeps = rep(1, length(initial_par))))
+# opt <- optimx(par = initial_par, fn = compute_oob, method = "L-BFGS-B",lower = min_par, upper = max_par, itnmax = c(5),
+#              control = list(trace = 0, all.methods = FALSE, maxit = 5, ndeps = rep(0.001, length(initial_par))))
 
 # Uncomment to apply PSO 
-# opt <- psoptim(initial_par, fn = compute_oob, lower = min_par, upper = max_par, 
-#         control = list(maxit = 10, s = 10, w = 0.5, c.p = 0.4, c.g = 0.6))
+# opt <- psoptim(initial_par, fn = compute_oob, lower = min_par, upper = max_par,
+#         control = list(maxit = 3, s = 10, w = 0.5, c.p = 0.4, c.g = 0.6))
 
 
 #######################
@@ -141,10 +140,11 @@ fwrite(report, report_file, quote = F, append = F, sep = ",", row.names = F, col
 
 search_space <- data.frame(matrix(ncol = length(par_names), nrow = 0))
 colnames(search_space) <- par_names
-search_space[1,] <- c(8,45,10,30,10)
-search_space[2,] <- c(12,60,20,30,10)
-search_space[3,] <- c(24,45,25,35,10)
-search_space[4,] <- c(36,50,20,30,10)
+#search_space[1,] <- c(8,45,20,30,10,20)
+search_space[1,] <- c(36,60,20,20,10,20)
+#search_space[2,] <- c(12,60,20,30,10,10)
+#search_space[3,] <- c(24,45,25,35,10,10)
+#search_space[4,] <- c(36,50,20,30,10,10)
 
 # i<-1
 for( i in seq(1,nrow(search_space),1)){
