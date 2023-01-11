@@ -1,3 +1,4 @@
+import time
 from random import randint
 from code_pipeline.tests_generation import RoadTestFactory
 from time import  sleep
@@ -153,6 +154,7 @@ class MBTGenerator:
             log.info(f"Remaining time {self.executor.get_remaining_time()}")
 
             # Try to execute the test
+            time.sleep(1)
             test_outcome, description, execution_data = self.executor.execute_test(the_test)
             log.info(f"Executed test {the_test.id}. Remaining time {self.executor.get_remaining_time()}")
 
