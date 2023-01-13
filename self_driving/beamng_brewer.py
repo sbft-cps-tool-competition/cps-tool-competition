@@ -77,10 +77,3 @@ class BeamNGBrewer:
         self.beamng.start_scenario()
 
         self.beamng.pause()
-
-    def __del__(self):
-        if self.beamng:
-            try:
-                self.beamng.close()
-            except:
-                pass

@@ -1,5 +1,3 @@
-import subprocess
-
 import numpy as np
 from tensorflow.python.keras.models import load_model
 
@@ -219,13 +217,12 @@ class Dave2Executor(AbstractTestExecutor):
     def _close(self):
         if self.brewer:
             try:
-                self.brewer.beamng.scenario.close()
-
-                beamng_program_name = "BeamNG.tech.x64"
-                cmd = "taskkill /IM \"{}.exe\" /F".format(beamng_program_name)
-                ret = subprocess.check_output(cmd)
-
-                output_str = ret.decode("utf-8")
+                # replicating beamng close method. The issue is that the kill_beamng method is not called for some
+                # reason
+                if self.brewer.beamng.scenario:
+                    self.brewer.scenario.close()
+                    self.brewer.scenario = None
+                self.brewer.beamng.kill_beamng()
             except Exception as ex:
                 traceback.print_exception(type(ex), ex, ex.__traceback__)
             self.brewer = None
