@@ -109,7 +109,6 @@ As explained [here](../README.md), the evaluation is based on a feature coverage
 * Mean Lateral Position (MLP). We measure how close the driving agent drives to the lane margins.
  
 The features are computed only for failed tests with respect to the road segment relevant to the failure. This segment is the 60 unit long segment centered around the out-of-bounds location (30 units before, 30 units after).
-For the evaluation we will consider (at least) the following metrics:
 
 > **Note**: tests fail for different reasons. For example, a test fail if the ego-car does
 >not move, or does not reach the end of the road within a timeout (computed over the length
