@@ -223,6 +223,9 @@ class Dave2Executor(AbstractTestExecutor):
                     self.brewer.scenario.close()
                     self.brewer.scenario = None
                 self.brewer.beamng.kill_beamng()
+
+                time.sleep(2)
+
             except Exception as ex:
                 traceback.print_exception(type(ex), ex, ex.__traceback__)
             self.brewer = None

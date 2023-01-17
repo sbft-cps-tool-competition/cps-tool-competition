@@ -45,7 +45,7 @@ def min_radius(x, w=5):
 
 class TestValidator:
 
-    def __init__(self, map_size, min_road_length=40):
+    def __init__(self, map_size, min_road_length=20):
         self.map_size = map_size
         self.box = (0, 0, map_size, map_size)
         self.road_bbox = RoadBoundingBox(self.box)
