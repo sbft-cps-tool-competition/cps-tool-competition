@@ -1,7 +1,0 @@
-sbt,
-Dsut_efsm,eu.fbk.iv4xr.mbt.efsm.cps.BeamNgModelGenerator2
-Doutput_dir,mbt_generator\mbt-files
-Dmodelcriterion,KTRANSITION
-Dk_transition_size,2
-Dalgorithm,MOSA
-Dminimize_suite,TRUE

@@ -122,7 +122,7 @@ def run_mbt(generation_budget, map_size):
         runs EvoMBT with the given time budget.
         after the run, generated tests (each in csv format) are stored in mbt-files folder
     """
-    jar_file = os.path.join(get_mbt_root_path(), 'EvoMBT-1.2.1-jar-with-dependencies.jar')
+    jar_file = os.path.join(get_mbt_root_path(), 'EvoMBT-1.2.2-jar-with-dependencies.jar')
     print(f"Jar File {jar_file}")
     params = read_params_from_csv()
     print(params)
@@ -137,7 +137,7 @@ def run_mbt(generation_budget, map_size):
     subprocess.call(all_params)
 
 
-class MBTGenerator:
+class EvoMBTGenerator:
     """
         This is a wrapper for the MBT generator in Java
     """
