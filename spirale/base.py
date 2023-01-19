@@ -8,7 +8,7 @@ class RoadtitionBase():
     def __init__(self, executor=None, map_size=None):
         self.executor = executor  # attribute that defines the type of executor
         self.map_size = map_size  # attribute specifying the square size of the map
-        self.visualize = RoadTestVisualizer(self.map_size)  # To display the roads on the screen
+        #self.visualize = RoadTestVisualizer(self.map_size)  # To display the roads on the screen
 
     def execute_test(self, road_points):
         '''
@@ -24,7 +24,7 @@ class RoadtitionBase():
         test_outcome, description, execution_data = self.executor.execute_test(test)
         print("\033[1;34m test_outcome= \033[1;31m", test_outcome, "\033[1;30m")
         #print("\033[1;34m execution_data.oob= \033[1;31m", execution_data[0].oob_distance, "\033[1;30m")
-        self.visualize.visualize_road_test(test)
+        #self.visualize.visualize_road_test(test)
 
         return test_outcome , execution_data
 
