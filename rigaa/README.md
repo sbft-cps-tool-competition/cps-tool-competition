@@ -5,7 +5,7 @@
 	Reinforcement learning Informed Genetic Algorithm for Autonomous system testing
 </h1>
 
-This repository contains the implementation of our tool RIGAA, adapted for the SBFT 2023 competition. This tool is based on our previous search based tool AmbieGen:
+This repository contains the implementation of our tool RIGAA, adapted for the SBFT 2023 competition. This tool is based on our previous search based tool [AmbieGen](https://github.com/swat-lab-optimization/AmbieGen-tool):
 ```
 @article{ambiegen,
   doi = {10.48550/ARXIV.2301.01234},
@@ -31,5 +31,5 @@ In this tool the NSGA-II algorithm implementation is is based on [pymoo framewor
     ``` 
 ## Authors
 #### Dmytro Humeniuk, Foutse Khomh, Giuliano Antoniol
-Polytechnique Montréal, Canada
+Polytechnique Montréal, Canada  
 Contact e-mail: dmytro.humeniuk@polymtl.ca
