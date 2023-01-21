@@ -30,11 +30,6 @@ class RIGAATestGenerator:
         """
         Function for running the optimization and saving the results"""
 
-        #log_file = "logs.txt"
-
-        #setup_logging(log_file, debug)
-        #global my_executor
-        #my_executor = self.executor
         while not self.executor.is_over():
             log.info("Running the optimization")
             log.info("Problem: %s, Algorithm: %s", problem, algo)
@@ -64,12 +59,6 @@ class RIGAATestGenerator:
             else:
                 termination = get_termination("n_eval", n_eval)
                 log.info("The search will be terminated after %d evaluations", n_eval)
-
-            #termination = get_termination("time", "01:30:00")
-
-            #tc_stats = {}
-            #tcs = {}
-            #tcs_convergence = {}
             
             if (random_seed is not None):
                 seed = random_seed
@@ -95,29 +84,6 @@ class RIGAATestGenerator:
                     "Remaining time %s",
                     self.executor.get_remaining_time(),
                 )
-
-            
-            #print(self.executor.stats)
             my_executor = res.algorithm.callback.executor
-            #print(my_executor.stats)
             self.executor.stats = my_executor.stats
-            #print(self.executor.get_stats())
-
-
-        #test_suite = get_test_suite(res, algo)
-        '''
-        tc_stats["run" + str(m)] = get_stats(res, problem, algo)
-        tcs["run" + str(m)] = test_suite
-
-        tcs_convergence["run" + str(m)] = get_convergence(res, n_offsprings)
-        
-        if save_results == "True":
-            save_tc_results(tc_stats, tcs, tcs_convergence, algo, problem)
-            save_tcs_images(test_suite, problem, m, algo)
-        #return test_suite
-        '''
-
-
-################################## MAIN ########################################
-
 
