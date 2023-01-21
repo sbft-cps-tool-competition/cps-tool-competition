@@ -1,5 +1,5 @@
 <p align="center">
-	<img height="200px" src="trained_veh.gif"/>
+	<img height="300px" width="300px" src="trained_veh.gif"/>
 </p>
 <h1 align="center">
 	Reinforcement learning Informed Genetic Algorithm for Autonomous system testing
