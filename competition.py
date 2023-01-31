@@ -12,6 +12,9 @@ import errno
 import logging as log
 import csv
 
+import matplotlib
+matplotlib.use('Agg')
+
 from code_pipeline.visualization import RoadTestVisualizer
 from code_pipeline.tests_generation import TestGenerationStatistic
 from code_pipeline.test_generation_utils import register_exit_fun

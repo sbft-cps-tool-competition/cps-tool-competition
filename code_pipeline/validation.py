@@ -45,7 +45,7 @@ def min_radius(x, w=5):
 
 class TestValidator:
 
-    def __init__(self, map_size, min_road_length = 20):
+    def __init__(self, map_size, min_road_length=20):
         self.map_size = map_size
         self.box = (0, 0, map_size, map_size)
         self.road_bbox = RoadBoundingBox(self.box)
@@ -104,8 +104,7 @@ class TestValidator:
         return check
 
     def is_minimum_length(self, the_test):
-        # This is approximated because at this point the_test is not yet interpolated
-        return the_test.get_road_length() > self.min_road_length
+        return the_test.get_road_length(interpolate_road_points=True) > self.min_road_length
 
     def validate_test(self, the_test):
 

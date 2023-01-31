@@ -1,5 +1,5 @@
 from self_driving.road_polygon import RoadPolygon
-from shapely.geometry import  LineString
+from shapely.geometry import LineString
 from scipy.interpolate import splev, splprep
 from numpy.ma import arange
 from shapely.geometry import LineString
@@ -37,7 +37,7 @@ def _interpolate(the_test):
         # Otheriwse, use cubic splines
         k = 3
 
-    pos_tck, pos_u = splprep([old_x_vals, old_y_vals], s= smoothness, k=k)
+    pos_tck, pos_u = splprep([old_x_vals, old_y_vals], s=smoothness, k=k)
 
     step_size = 1 / num_nodes
     unew = arange(0, 1 + step_size, step_size)
@@ -59,7 +59,6 @@ def _incremental_id_generator():
 
 
 class RoadTestFactory:
-
     # Static variable
     test_id_generator = _incremental_id_generator()
 
@@ -86,7 +85,9 @@ class RoadTestFactory:
         def get_road_polygon(self):
             return self.road_polygon
 
-        def get_road_length(self):
+        def get_road_length(self, interpolate_road_points: bool = False):
+            if interpolate_road_points:
+                return LineString([(t[0], t[1]) for t in _interpolate(self.interpolated_points)]).length
             return LineString([(t[0], t[1]) for t in self.interpolated_points]).length
 
         def set_validity(self, is_valid, validation_message):
@@ -104,12 +105,12 @@ class RoadTestFactory:
             # https://stackoverflow.com/questions/610883/how-to-know-if-an-object-has-an-attribute-in-python
             # "easier to ask for forgiveness than permission" (EAFP)
             try:
-                theobj['id' ] = self.id
+                theobj['id'] = self.id
             except AttributeError:
                 pass
 
             try:
-                theobj['execution_data' ] = self.execution_data
+                theobj['execution_data'] = self.execution_data
             except AttributeError:
                 pass
 
@@ -182,9 +183,10 @@ class TestGenerationStatistic:
 
     def as_csv(self):
         # TODO There's definitively a more python way to do this
-        header = ",".join(["test_generated","test_valid","test_invalid","test_passed","test_failed",
-                           "test_in_error","real_time_generation", "real_time_execution","simulated_time_execution"])
+        header = ",".join(["test_generated", "test_valid", "test_invalid", "test_passed", "test_failed",
+                           "test_in_error", "real_time_generation", "real_time_execution", "simulated_time_execution"])
         values = ",".join([str(self.test_generated), str(self.test_valid), str(self.test_invalid),
                            str(self.test_passed), str(self.test_failed), str(self.test_in_error),
-                           str(sum(self.test_generation_real_times)), str(sum(self.test_execution_real_times)), str(sum(self.test_execution_simulation_times))])
+                           str(sum(self.test_generation_real_times)), str(sum(self.test_execution_real_times)),
+                           str(sum(self.test_execution_simulation_times))])
         return '\n'.join([header, values])
