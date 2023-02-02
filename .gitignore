@@ -132,3 +132,5 @@ dmypy.json
 .pyre/
 results/
 simulations/
+*.jar
+mbt-files
