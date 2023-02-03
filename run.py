@@ -29,8 +29,7 @@ def run_on_powershell(python_exe, tool, dave2=False):
 
     beamng_home = "C:/Users/japeltom/BeamNG/BeamNG.tech.v0.26.2.0"
     beamng_user = "C:/Users/japeltom/Documents/BeamNG.research"
-    #budget = 3*3600
-    budget = 150
+    budget = 3*3600
 
     command = "{} competition.py --map-size 200 --beamng-home {} --beamng-user {} --time-budget {} ".format(python_exe, beamng_home, beamng_user, budget)
     command += commands[tool]
