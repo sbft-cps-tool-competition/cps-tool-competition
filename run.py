@@ -6,8 +6,7 @@ import numpy as np
 python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv\\Scripts\\python.exe"
 
 # RIGAA not listed as it needs Python 3.9
-#tools = ["crag", "evombt", "roadsign", "spirale", "wogan"]
-tools = ["wogan"]
+tools = ["crag", "evombt", "roadsign", "spirale", "wogan"]
 commands = {
     "crag": "--module-path crag-sbft2023 --module-name src.crag --class-name CRAG ",
     "evombt": "--module-path evombt_generator --module-name evombt_generator --class-name EvoMBTGenerator ",
