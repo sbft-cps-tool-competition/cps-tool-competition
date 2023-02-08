@@ -1,4 +1,4 @@
-
+import copy
 
 import matplotlib.pyplot as plt
 import time
@@ -34,6 +34,17 @@ class VehicleSolution:
         self.intp_points = []
         self.just_fitness = 0
         self.executor = executor
+
+    def __deepcopy__(self, memodict={}):
+        cpyobj = type(self)(self.map_size, self.executor)  # shallow copy of whole object
+        cpyobj.road_points = copy.deepcopy(self.road_points, memodict)  # deepcopy required attr
+        cpyobj.states = copy.deepcopy(self.states, memodict)  # deepcopy required attr
+        cpyobj.fitness = copy.deepcopy(self.fitness, memodict)  # deepcopy required attr
+        cpyobj.car_path = copy.deepcopy(self.car_path, memodict)  # deepcopy required attr
+        cpyobj.novelty = copy.deepcopy(self.novelty, memodict)  # deepcopy required attr
+        cpyobj.intp_points = copy.deepcopy(self.intp_points, memodict)  # deepcopy required attr
+        cpyobj.just_fitness = copy.deepcopy(self.just_fitness, memodict)  # deepcopy required attr
+        return cpyobj
 
     def eval_fitness(self):
         """

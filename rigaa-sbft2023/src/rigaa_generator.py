@@ -69,7 +69,7 @@ class RIGAATestGenerator:
                 termination,
                 seed=seed,
                 verbose=False,
-                save_history=True,
+                save_history=False,
                 eliminate_duplicates=True,
                 callback=DebugCallback()
             )
