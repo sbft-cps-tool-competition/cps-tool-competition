@@ -2,11 +2,15 @@ import os, sys, shutil
 from pathlib import Path
 import subprocess
 import numpy as np
+import datetime
 
 python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv\\Scripts\\python.exe"
+#python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv2\\Scripts\\python.exe"
 
 # RIGAA not listed as it needs Python 3.9
 tools = ["crag", "evombt", "roadsign", "spirale", "wogan"]
+tools = ["wogan"]
+#tools = ["rigaa"]
 commands = {
     "crag": "--module-path crag-sbft2023 --module-name src.crag --class-name CRAG ",
     "evombt": "--module-path evombt_generator --module-name evombt_generator --class-name EvoMBTGenerator ",
@@ -30,6 +34,7 @@ def run_on_powershell(python_exe, tool, dave2=False):
     beamng_home = "C:/Users/japeltom/BeamNG/BeamNG.tech.v0.26.2.0"
     beamng_user = "C:/Users/japeltom/Documents/BeamNG.research"
     budget = 3*3600
+    budget = 150
 
     command = "{} competition.py --map-size 200 --beamng-home {} --beamng-user {} --time-budget {} ".format(python_exe, beamng_home, beamng_user, budget)
     command += commands[tool]
@@ -49,6 +54,18 @@ def clear_simulations():
     #    shutil.rmtree(path)
     pass
 
+def backup_simulations(sims_before, tool, dave2):
+    sims_now = Path("./simulations/beamng_executor").glob("sim_2023*")
+    new_sims = [sim for sim in sims_now if sim not in sims_before]
+
+    print(len(new_sims), "New simulation directories")
+
+    suffix = "dave2" if dave2 else "beamng"
+    tool_sim_dir = f"./simulations/{tool}_{suffix}_{datetime.datetime.now().strftime('%Y-%m-%d_%H-%M-%S')}"
+    os.makedirs(tool_sim_dir, exist_ok=True)
+    for sim in new_sims:
+        shutil.move(str(sim), tool_sim_dir)
+
 # Clear simulation files from simulations/. Notice that you need to uncomment lines above.
 clear_simulations()
 
@@ -60,4 +77,6 @@ while min(order.count(tool) for tool in tools) < N:
         order.append(tool)
 
 for tool in order:
+    sims_before = list(Path("./simulations/beamng_executor").glob("sim_2023*"))
     run_on_powershell(python_exe, tool, dave2)
+    backup_simulations(sims_before, tool, dave2)
