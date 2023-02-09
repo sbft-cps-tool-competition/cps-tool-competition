@@ -2,6 +2,9 @@
 #
 #
 #
+import copy
+import json
+
 import click
 import importlib
 import traceback
@@ -178,6 +181,21 @@ def create_summary(result_folder, raw_data):
         output_file.write(csv_content)
 
     log.info("OOB  Report available: %s", oob_summary_file)
+
+    oob_details_file = os.path.join(result_folder, "oob_details.json")
+    oob_report = oobAnalyzer.oobs
+    filtered_oob_report = []
+    # Filtering properties that are not JSON serializable
+    for oob_report_item in oob_report:
+        oob_report_item = copy.deepcopy(oob_report_item)
+        oob_report_item.pop('oob_point', None)
+        oob_report_item.pop('road_segment_before_oob', None)
+        oob_report_item.pop('road_segment_after_oob', None)
+        oob_report_item.pop('interesting_segment', None)
+        filtered_oob_report.append(oob_report_item)
+
+    with open(oob_details_file, 'w') as oob_details_file:
+        oob_details_file.write(json.dumps(filtered_oob_report))
 
 
 def post_process(ctx, result_folder, the_executor):
