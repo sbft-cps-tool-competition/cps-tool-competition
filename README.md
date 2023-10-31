@@ -4,7 +4,7 @@ The [SBFT Workshop](https://sbft24.github.io/) offers a challenge for software t
 
 ## Important Dates
 
-The deadline to submit your tool is: **November 11th 2023**
+The deadline to submit your tool is: ~~**November 11th 2023**~~ **December 1st 2023**
 
 The results of the evaluation will be communicated to participants on: **December 21st 2023**
 
