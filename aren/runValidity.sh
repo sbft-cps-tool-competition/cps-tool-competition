@@ -4,7 +4,7 @@ current_date_time=$(date '+%d-%H-%M-%S')
 
 python competition.py \
     --time-budget 600 \
-    --executor mock \
+    --executor beamng \
     --dave2-model "C:\git\cps-tool-competition\dave2\beamng-dave2.h5" \
     --beamng-home "C:\applications\BeamNG.tech.v0.26.2.0" \
     --beamng-user "C:\applications\BeamNG.tech.v0.26.2.0_userpath" \

@@ -8,7 +8,7 @@ def validate(executor, the_test):
     else:
         executor.stats.test_invalid += 1
     
-    return is_valid
+    return is_valid, validation_msg
 
 def visualise(executor, the_test):
     executor.road_visualizer.visualize_road_test(the_test)

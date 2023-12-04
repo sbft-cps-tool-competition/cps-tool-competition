@@ -4,57 +4,127 @@ import math
 from code_pipeline.validation import min_radius
 from shapely.geometry import LineString
 
-# Simplification: use a fixed d for all points
-# TODO important: To increase granularity, reduce d_to_next_point, and adjust bounds for theta
-D_TO_NEXT_POINT = 10
+# NOTE, as simplification, we use a fixed d for all points
+# to increase granularity, reduce d_to_next_point, and adjust bounds for theta
+# TODO future work:
+# fine-tune these values
+D_TO_NEXT_POINT = 15 #10, 15
+THETA_MAX = 50 #35, 50
 
-
-def getDirCov(x):    
-    # theoretical maximum is 0.5, if we have a full circle.
-    # This is because we use a method based on cos/dot-product
-    angles_range = [0,0]
-    cur_angle = 0
-    num_p = x['num_points']
-    for i in range(num_p):
-        theta = x[f'p{i}_theta']
-        cur_angle += theta
-        angles_range[0] = min(angles_range[0], cur_angle)
-        angles_range[1] = max(angles_range[1], cur_angle)
-
-    dir_cov = (angles_range[1] - angles_range[0]) / 360
-    return dir_cov
-
-
-def getMaxCurv(x):
-
-    max_curv = 0
-    return max_curv
-
+TSHD_RADIUS=47
+INITIAL_POINT = (7, 7)
 
 # ### VALIDITY HEURISTICS
 
-TSHD_RADIUS=47
+def heu_missing_distance(missing_dist, map_size):
+    base = (map_size-2*INITIAL_POINT[0]) + (map_size-2*INITIAL_POINT[1])
+    return missing_dist / base
+
+
+def heu_approxSelfIntersecting(points):
+    line = LineString(points)
+    return 0 if line.is_simple else 1
+
+
+# def heu_selfIntersecting(test):
+#     # NOTE this is VERY time-consuming
+#     road_polygon = test.get_road_polygon()
+#     check = road_polygon.is_valid()
+#     return 0 if check else 1
+
+
 def heu_tooSharpTurns(test):
     min_r = min_radius(test.interpolated_points)
     if min_r > TSHD_RADIUS:
         return 0
     else:
-        return TSHD_RADIUS - min_r
+        return (TSHD_RADIUS - min_r) / TSHD_RADIUS
 
 
-def heu_approxSelfIntersecting(points):
-    # TODO improve granularity?
-    line = LineString(points)
-    return 0 if line.is_simple else 1
+# ### DIVERSITY HEURISTICS
 
-def heu_selfIntersecting(test):
-    #  VERY time-consuming
-    road_polygon = test.get_road_polygon()
-    check = road_polygon.is_valid()
-    return 0 if check else 1
+class FeatureDistribution:
+
+    def __init__(self, min_val, max_val):
+        # TODO future work:
+        # make this an ordered list to improve performance
+        self.seen = []
+        self.min = min_val
+        self.max = max_val
+        self.biggest_gap = max_val - min_val
+
+
+def heu_diversity(feature_name, features, all_distributions):
+
+    distribution = all_distributions[feature_name]
+    feature_val = features[feature_name]
+
+    # et closest point in both directions
+    d_smallest, new_big_gap = diversity_metrics(distribution, feature_val)
+    score = diversity_score(d_smallest, distribution.biggest_gap)
+
+    # update the biggest gap
+    if new_big_gap + d_smallest >= distribution.biggest_gap-0.00001:
+        distribution.biggest_gap = new_big_gap
+
+    # get heuristic from score
+    if score == 0:
+        return float('inf'), score
+    else:
+        return 1/(score*(1+len(distribution.seen))), score
+
+
+def diversity_metrics(distribution, new_value):
+
+    # handle the (very unlikely) case where new_value is not in the range
+    if new_value < distribution.min:
+        distribution.min = new_value
+    elif new_value > distribution.max:
+        distribution.max = new_value
+
+    # TODO future work:
+    # do better handling of out-of-range cases
+    
+    upper_bound = distribution.max
+    lower_bound = distribution.min
+    
+    smallest_dist_below = upper_bound-lower_bound
+    smallest_dist_above = upper_bound-lower_bound
+    for v in distribution.seen:
+        # below
+        d_below = new_value-v
+        d_below = d_below if d_below >= 0 else upper_bound-lower_bound+(d_below) # circular
+        smallest_dist_below = min(smallest_dist_below, d_below)
+
+        # above
+        d_above = d_below if d_below < 0.00001 else upper_bound-lower_bound-(d_below)
+        smallest_dist_above = min(smallest_dist_above, d_above)
+
+    if smallest_dist_below < smallest_dist_above:
+        smallest_dist = smallest_dist_below
+        new_biggest_poential_gap = smallest_dist_above
+    else:
+        smallest_dist = smallest_dist_above
+        new_biggest_poential_gap = smallest_dist_below
+
+    return smallest_dist, new_biggest_poential_gap
+
+
+def diversity_score(small_dist, biggest_gap):
+    # [(0)..(1)]
+    # [(exactly on top of another point)..(exactly in the middle between the 2 furthest points)]
+    return small_dist / (biggest_gap/2)
+
+
+def heu_and_add_diversity(feature_name, features, all_distributions):
+    
+    heuristic, score = heu_diversity(feature_name, features, all_distributions)
+    all_distributions[feature_name].seen.append(score)
+    return heuristic, score
 
 
 # PATH GENERATION + checking if inside region
+
 
 def getRoadPointsFromAngles(x, map_size):
     p_pre, p_cur = getFirst2Points(x)
@@ -75,7 +145,7 @@ def getRoadPointsFromAngles(x, map_size):
     return road_points, missing_dist
 
 
-INITIAL_POINT = (7, 7)
+# NOTE: road width is 8 (lane width is 4)
 def getFirst2Points(x):
     # Start at bottom-left corner, going diagonally to the top-right
     starting_angle = 45
@@ -120,7 +190,8 @@ def reframe(road_points, map_size):
         return reframed_points, 0
     else:
         # size is too big, cannot reframe
-        # TODO better missing_dist?
+        # TODO future work:
+        # improveissing distance measurment?
         missing_dist = 0
         missing_dist += max(0, missing_x)
         missing_dist += max(0, missing_y)
