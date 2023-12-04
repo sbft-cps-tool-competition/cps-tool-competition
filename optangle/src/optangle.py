@@ -21,13 +21,7 @@ class OptAngleGenerator():
 
     def start(self):
 
-        # (1) GET PARAMETERS
-        max_num_points = 30
-
-        # (2) DEFINE THE FITNESS FUNCTIONS and CONSTRAINTS
-        num_objectives = 3
-
-        # (2.1) Keep a map of seen feature values to promote diversity
+        # (0) Keep a map of seen feature values to promote diversity
 
         # TODO future work:
         # Get better (dynamic?) bounds for the last 3 features 
@@ -37,7 +31,8 @@ class OptAngleGenerator():
         all_distributions['STD_SA'] = utils.FeatureDistribution(-180, 180)
         all_distributions['MEAN_LP'] = utils.FeatureDistribution(-2, 6)
         all_distributions['MAX_LP'] = utils.FeatureDistribution(-2, 6)
-
+        
+        NUM_OBJECTIVES = 3
         def get_heuristics(x):
             # x = [theta_p1, theta_p2, theta_p3, ...]
 
@@ -201,15 +196,15 @@ class OptAngleGenerator():
             return [heu_validity, heu_oob_percentage, heu_diversity]
 
 
-        # (3) DEFINE THE PROBLEM
+        # (1) DEFINE THE PROBLEM
         class SBFTProblemMixed(ElementwiseProblem):
             
             def __init__(self, **kwargs):
                 vars = {}
-                for i in range(max_num_points):
+                for i in range(utils.POINTS_RANGE[1]):
                     vars[f'p{i}_theta'] = Real(bounds=(-utils.THETA_MAX, utils.THETA_MAX))
-                vars[f'num_points'] = Integer(bounds=(5, max_num_points))
-                super().__init__(vars=vars, n_obj=num_objectives, **kwargs)
+                vars[f'num_points'] = Integer(bounds=utils.POINTS_RANGE)
+                super().__init__(vars=vars, n_obj=NUM_OBJECTIVES, **kwargs)
 
             # Notes: x = [theta_p1, d_p1, theta_p2, d_p2, theta_p3, d_p3, ...]
             # TODO potential simplification: use a fixed d for all points
@@ -219,7 +214,7 @@ class OptAngleGenerator():
                 
         problem =  SBFTProblemMixed()
     
-        # (4) GET THE ALGORITHM
+        # (2) GET THE ALGORITHM
         # TODO future work:
         # fine-tune this (algorithm, parameters, Scenic implementation of NSGA2 w/ restarts)
         
@@ -227,7 +222,7 @@ class OptAngleGenerator():
         # find a way to ensure that an executed test does not get into the next population.
         algorithm = MixedVariableGA(pop_size=10, n_offsprings=10, survival=RankAndCrowdingSurvival())
 
-        # (5) GET THE TERMINATION CRITERIA
+        # (3) GET THE TERMINATION CRITERIA
         class SBFTTermination(Termination):
 
             def __init__(self, executor) -> None:
@@ -239,7 +234,7 @@ class OptAngleGenerator():
 
         termination = SBFTTermination(self.executor)
 
-        # (6) RUN THE ALGORITHM
+        # (4) RUN THE ALGORITHM
 
         # TODO future work:
         # Think about using a seed

@@ -7,9 +7,10 @@ from shapely.geometry import LineString
 # NOTE, as simplification, we use a fixed d for all points
 # to increase granularity, reduce d_to_next_point, and adjust bounds for theta
 # TODO future work:
-# fine-tune these values
-D_TO_NEXT_POINT = 15 #10, 15
-THETA_MAX = 50 #35, 50
+# fine-tune these values. For now, (20, 65, (3, 20)) is best, then (10, 35, (5, 30)), then (15, 50, (5, 30))
+D_TO_NEXT_POINT = 20 #10, 15, 20
+THETA_MAX = 65 #35, 50, 65
+POINTS_RANGE = (3, 20) # (5, 30), (5, 30), (3, 20)
 
 TSHD_RADIUS=47
 INITIAL_POINT = (7, 7)
@@ -68,10 +69,14 @@ def heu_diversity(feature_name, features, all_distributions):
         distribution.biggest_gap = new_big_gap
 
     # get heuristic from score
-    if score == 0:
-        return float('inf'), score
-    else:
-        return 1/(score*(1+len(distribution.seen))), score
+    
+    # TODO future work:
+    # this can beimproved, specially considering the aggregation applied to it
+    # if score == 0:
+    #     return float('inf'), score
+    # else:
+    #     return 1/(score*(1+len(distribution.seen))), score
+    return (1-score), score
 
 
 def diversity_metrics(distribution, new_value):
