@@ -1,5 +1,5 @@
 
-import aren.src.utils as utils
+import optangle.src.utils as utils
 from code_pipeline.tests_generation import RoadTestFactory
 
 from pymoo.algorithms.moo.nsga2 import RankAndCrowdingSurvival
@@ -9,7 +9,7 @@ from pymoo.core.variable import Real, Integer
 from pymoo.core.termination import Termination
 from pymoo.optimize import minimize
 
-class ArenGenerator():
+class OptAngleGenerator():
     """
         Generates test cases using a GA over a mixed-variable representation of the road.
         The road is defined by a sequence of road angles at a fixed distance from each other.

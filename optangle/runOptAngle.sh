@@ -11,7 +11,7 @@ python competition.py \
     --map-size 200 \
     --speed-limit 70 \
     --oob-tolerance 0.85 \
-    --log-to "C:\git\cps-tool-competition\aren\log\\${current_date_time}.log" \
-    --module-path "C:\git\cps-tool-competition\aren" \
-    --module-name  "src.aren_generator"\
-    --class-name ArenGenerator
+    --log-to "C:\git\cps-tool-competition\optangle\log\\${current_date_time}.log" \
+    --module-path "C:\git\cps-tool-competition\optangle" \
+    --module-name  "src.optangle"\
+    --class-name OptAngleGenerator
