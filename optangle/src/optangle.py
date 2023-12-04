@@ -207,7 +207,6 @@ class OptAngleGenerator():
                 super().__init__(vars=vars, n_obj=NUM_OBJECTIVES, **kwargs)
 
             # Notes: x = [theta_p1, d_p1, theta_p2, d_p2, theta_p3, d_p3, ...]
-            # TODO potential simplification: use a fixed d for all points
             def _evaluate(self, x, out, *args, **kwargs):
                 heuristics = get_heuristics(x)
                 out["F"] = heuristics
