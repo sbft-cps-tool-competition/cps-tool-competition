@@ -238,5 +238,5 @@ class OptAngleGenerator():
 
         # TODO future work:
         # Think about using a seed
-        res = minimize(problem, algorithm, termination, seed=1234, verbose=1)
+        res = minimize(problem, algorithm, termination, verbose=1)
 
