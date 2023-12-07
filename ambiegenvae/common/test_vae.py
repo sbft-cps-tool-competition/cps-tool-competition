@@ -16,7 +16,10 @@ def load_model(epoch, model, path='.//'):
     filename = path + '/neural_network_{}.pt'.format(epoch)
 
     # loading the parameters of the saved model
-    model.load_state_dict(torch.load(filename))
+    # model.load_state_dict(torch.load(filename))
+    
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    model.load_state_dict(torch.load(filename, map_location=device))
 
     return model
 
