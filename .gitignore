@@ -131,6 +131,11 @@ dmypy.json
 # Pyre type checker
 .pyre/
 results/
+final_results/
+final_results2/
 simulations/
+*stats_ga*
+calculate_coverage.py
+plot_beamng.py
 *.jar
 mbt-files
