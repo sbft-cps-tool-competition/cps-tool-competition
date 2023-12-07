@@ -4,15 +4,16 @@ import subprocess
 import numpy as np
 import datetime
 
-python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv\\Scripts\\python.exe"
+python_exe = "python"
 #python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv2\\Scripts\\python.exe"
 
 # RIGAA not listed as it needs Python 3.9
-tools = ["crag", "evombt", "roadsign", "spirale", "wogan"]
-tools = ["wogan"]
+tools = ["crag", "evombt", "rigaa", "roadsign", "spirale", "wogan"]
+tools = ["crag24"]
 #tools = ["rigaa"]
 commands = {
     "crag": "--module-path crag-sbft2023 --module-name src.crag --class-name CRAG ",
+    "crag24": "--module-path crag-sbft2024 --module-name src.crag --class-name CRAG ",
     "evombt": "--module-path evombt_generator --module-name evombt_generator --class-name EvoMBTGenerator ",
     "rigaa": "--module-path rigaa-sbft2023 --module-name src.rigaa_generator --class-name RIGAATestGenerator ",
     "roadsign": "--module-path roadsign-sbft2023 --module-name src.roadsign_generator --class-name RoadSignGenerator ",
@@ -31,10 +32,11 @@ dave2 = len(sys.argv) > 2 and sys.argv[2].lower() == "dave2"
 def run_on_powershell(python_exe, tool, dave2=False):
     python_exe = python_exe.strip()
 
-    beamng_home = "C:/Users/japeltom/BeamNG/BeamNG.tech.v0.26.2.0"
-    beamng_user = "C:/Users/japeltom/Documents/BeamNG.research"
-    budget = 3*3600
-    budget = 150
+    beamng_home = "C:/Users/stefan/Downloads/BeamNG.tech.v0.26.2.0"
+    beamng_user = "C:/Users/stefan/BeamNG.tech"
+    minutes = 60
+    hours = 60 * minutes
+    budget = 10 * minutes
 
     command = "{} competition.py --map-size 200 --beamng-home {} --beamng-user {} --time-budget {} ".format(python_exe, beamng_home, beamng_user, budget)
     command += commands[tool]
