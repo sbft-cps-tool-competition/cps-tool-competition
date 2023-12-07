@@ -48,13 +48,13 @@ class AmbiegenVAEGenerator:
     def initialize_vae(self):
         self.nDim = 17 
         self.nLat = 17
-        self.archive = np.load("vae_dataset.npy")
+        self.archive = np.load("ambiegenvae\\vae_dataset.npy")
 
         mean = np.mean(self.archive, axis=0)  # mean for each feature
         std = np.std(self.archive, axis=0)
         self.transform = Denormalize1D(mean, std)
         self.model = VecVAE(self.nDim, self.nLat)
-        self.model = load_model(1500, self.model, path="VAE_models")
+        self.model = load_model(1500, self.model, path="ambiegenvae\\VAE_models")
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
         self.model.to(device)
 

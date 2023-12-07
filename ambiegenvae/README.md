@@ -55,11 +55,11 @@ However, we tested our soultion with GPU and this option is recommended.
 4. Start test case generation:  
 For BeamNg agent: 
 ```python
-python competition.py --time-budget 10800 --executor beamng --map-size 200 --module-name ambiegenvae_generator --class-name AmbiegenVAEGenerator --beamng-home "" --beamng-user "" --oob-tolerance 0.85
+python competition.py --time-budget 10800 --executor beamng --map-size 200 --module-name ambiegenvae.ambiegenvae_generator --class-name AmbiegenVAEGenerator --beamng-home "" --beamng-user "" --oob-tolerance 0.85
 ```
 For dave2 agent:
 ```python
-python competition.py --time-budget 10800 --executor dave2 --map-size 200 --module-name ambiegenvae_generator --class-name AmbiegenVAEGenerator --beamng-home "" --beamng-user "" --oob-tolerance 0.85 --dave2-model "dave2\\beamng-dave2.h5"
+python competition.py --time-budget 10800 --executor dave2 --map-size 200 --module-name ambiegenvae.ambiegenvae_generator --class-name AmbiegenVAEGenerator --beamng-home "" --beamng-user "" --oob-tolerance 0.85 --dave2-model "dave2\\beamng-dave2.h5"
 ```
 
 
