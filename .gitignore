@@ -132,7 +132,8 @@ dmypy.json
 .pyre/
 results/
 final_results/
+final_results2/
 simulations/
-*stats*
+*stats_ga*
 calculate_coverage.py
 plot_beamng.py
