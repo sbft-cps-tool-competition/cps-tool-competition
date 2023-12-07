@@ -137,3 +137,5 @@ simulations/
 *stats_ga*
 calculate_coverage.py
 plot_beamng.py
+*.jar
+mbt-files

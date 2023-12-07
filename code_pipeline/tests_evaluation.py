@@ -540,22 +540,22 @@ class OOBAnalyzer:
                     self.logger.warning(f"Failed to process OOB for test {sample_file}. Cause: {e}")
                     oobs.append(
                         {
-                            'test id': test_id,
-                            'simulation file': sample_file,
+                            'test_id': test_id,
+                            'simulation_file': sample_file,
                             # Point
-                            'oob point': None,
+                            'oob_point': None,
                             # LEFT/RIGHT
-                            'oob side': None,
+                            'oob_side': None,
                             # LineStrings representing the center of the road, interpolated points
-                            'road segment before oob': None,
-                            'road segment after oob': None,
+                            'road_segment_before_oob': None,
+                            'road_segment_after_oob': None,
                             # This is the list of points, so we need to extract from LineString objects
-                            'interesting segment': [],
-                            'direction coverage': None,
-                            'maximum curvature': None,
-                            'stdev steering': None,
-                            'mean lateral position': None,
-                            'max lateral position': None,
+                            'interesting_segment': [],
+                            'direction_coverage': None,
+                            'maximum_curvature': None,
+                            'stdev_steering': None,
+                            'mean_lateral_position': None,
+                            'max_lateral_position': None,
 
                         }
                     )
@@ -563,22 +563,22 @@ class OOBAnalyzer:
 
                 oobs.append(
                     {
-                        'test id': test_id,
-                        'simulation file': sample_file,
+                        'test_id': test_id,
+                        'simulation_file': sample_file,
                         # Point
-                        'oob point': oob_pos,
+                        'oob_point': oob_pos,
                         # LEFT/RIGHT
-                        'oob side': oob_side,
+                        'oob_side': oob_side,
                         # LineStrings representing the center of the road, interpolated points
-                        'road segment before oob': segment_before,
-                        'road segment after oob': segment_after,
+                        'road_segment_before_oob': segment_before,
+                        'road_segment_after_oob': segment_after,
                         # This is the list of points, so we need to extract from LineString objects
-                        'interesting segment': interesting_segment,
-                        'direction coverage': dir_cov,
-                        'maximum curvature': max_curv,
-                        'stdev steering': std_sa,
-                        'mean lateral position': mean_lp,
-                        'max lateral position': max_lp,
+                        'interesting_segment': interesting_segment,
+                        'direction_coverage': dir_cov,
+                        'maximum_curvature': max_curv,
+                        'stdev_steering': std_sa,
+                        'mean_lateral_position': mean_lp,
+                        'max_lateral_position': max_lp,
                     }
                 )
 
@@ -616,17 +616,17 @@ class OOBAnalyzer:
         max_distances_starting_from = {}
 
         # Filter only valid oob
-        for (oob1, oob2) in combinations([oob for oob in self.oobs if oob["oob point"] is not None], 2):
+        for (oob1, oob2) in combinations([oob for oob in self.oobs if oob["oob_point"] is not None], 2):
             # Compute distance between cells
-            distance = iterative_levenshtein(oob1['interesting segment'], oob2['interesting segment'])
-            self.logger.debug("Distance of OOB %s from OOB %s is %.3f", oob1["test id"], oob2["test id"], distance)
+            distance = iterative_levenshtein(oob1['interesting_segment'], oob2['interesting_segment'])
+            self.logger.debug("Distance of OOB %s from OOB %s is %.3f", oob1["test_id"], oob2["test_id"], distance)
 
             # Update the max values
-            if oob1['test id'] in max_distances_starting_from.keys():
-                max_distances_starting_from[oob1['test id']] = max(
-                    max_distances_starting_from[oob1['test id']], distance)
+            if oob1['test_id'] in max_distances_starting_from.keys():
+                max_distances_starting_from[oob1['test_id']] = max(
+                    max_distances_starting_from[oob1['test_id']], distance)
             else:
-                max_distances_starting_from[oob1['test id']] = distance
+                max_distances_starting_from[oob1['test_id']] = distance
 
         mean_distance = np.mean([list(max_distances_starting_from.values())]) if len(
             max_distances_starting_from) > 0 else np.NaN
@@ -642,7 +642,7 @@ class OOBAnalyzer:
         n_right = 0
 
         for oob in self.oobs:
-            if oob['oob side'] == "LEFT":
+            if oob['oob_side'] == "LEFT":
                 n_left += 1
             else:
                 n_right += 1
