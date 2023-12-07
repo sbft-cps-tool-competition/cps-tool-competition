@@ -7,13 +7,14 @@ import datetime
 python_exe = "python"
 #python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv2\\Scripts\\python.exe"
 
-# RIGAA not listed as it needs Python 3.9
-tools = ["crag", "evombt", "rigaa", "roadsign", "spirale", "wogan"]
-tools = ["crag24"]
-#tools = ["rigaa"]
+tools = ["crag24", "optangle", "ambiegenVAE"]
+tools = ["ambiegenVAE"]
 commands = {
     "crag": "--module-path crag-sbft2023 --module-name src.crag --class-name CRAG ",
     "crag24": "--module-path crag-sbft2024 --module-name src.crag --class-name CRAG ",
+    "optangle": "--module-path optangle --module-name  src.optangle --class-name OptAngleGenerator ",
+    "ambiegenVAE": "--module-path ambiegenvae --module-name ambiegenvae_generator --class-name AmbiegenVAEGenerator ",
+    
     "evombt": "--module-path evombt_generator --module-name evombt_generator --class-name EvoMBTGenerator ",
     "rigaa": "--module-path rigaa-sbft2023 --module-name src.rigaa_generator --class-name RIGAATestGenerator ",
     "roadsign": "--module-path roadsign-sbft2023 --module-name src.roadsign_generator --class-name RoadSignGenerator ",
