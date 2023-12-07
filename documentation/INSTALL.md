@@ -1,6 +1,7 @@
 # Installation Guide #
 
 ## General Information ##
+
 This project contains the code to take part in the tool competition.
 It is developed in Python and runs on Windows machines (we tested the code also by running Parallel Desktop on a Mac Book Pro).
 
@@ -17,7 +18,7 @@ Please fill the "Application Text" field of the registration form with the follo
 
 ```
 I would like to participate to the "Testing Self-Driving Car Software
-Contest" of the SBSF Tool Competition 2023 and for that I need to a
+Contest" of the SBSF Tool Competition 2024 and for that I need to a
 copy of BeamNG.tech
 ```
 
