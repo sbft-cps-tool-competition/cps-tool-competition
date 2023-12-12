@@ -5,15 +5,16 @@ import numpy as np
 import datetime
 
 python_exe = "python"
-#python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv2\\Scripts\\python.exe"
+# python_exe = "C:\\Users\\japeltom\\PycharmProjects\\sbsf23\\venv2\\Scripts\\python.exe"
 
-# RIGAA not listed as it needs Python 3.9
-tools = ["crag", "evombt", "rigaa", "roadsign", "spirale", "wogan"]
-tools = ["crag24"]
-#tools = ["rigaa"]
+tools = ["crag24", "optangle", "ambiegenVAE"]
+tools = ["ambiegenVAE"]
 commands = {
     "crag": "--module-path crag-sbft2023 --module-name src.crag --class-name CRAG ",
     "crag24": "--module-path crag-sbft2024 --module-name src.crag --class-name CRAG ",
+    "optangle": "--module-path optangle --module-name  src.optangle --class-name OptAngleGenerator ",
+    "ambiegenVAE": "--module-path ambiegenvae --module-name ambiegenvae_generator --class-name AmbiegenVAEGenerator ",
+
     "evombt": "--module-path evombt_generator --module-name evombt_generator --class-name EvoMBTGenerator ",
     "rigaa": "--module-path rigaa-sbft2023 --module-name src.rigaa_generator --class-name RIGAATestGenerator ",
     "roadsign": "--module-path roadsign-sbft2023 --module-name src.roadsign_generator --class-name RoadSignGenerator ",
@@ -29,6 +30,7 @@ except:
 
 dave2 = len(sys.argv) > 2 and sys.argv[2].lower() == "dave2"
 
+
 def run_on_powershell(python_exe, tool, dave2=False):
     python_exe = python_exe.strip()
 
@@ -38,23 +40,28 @@ def run_on_powershell(python_exe, tool, dave2=False):
     hours = 60 * minutes
     budget = 10 * minutes
 
-    command = "{} competition.py --map-size 200 --beamng-home {} --beamng-user {} --time-budget {} ".format(python_exe, beamng_home, beamng_user, budget)
+    command = "{} competition.py --map-size 200 --beamng-home {} --beamng-user {} --time-budget {} ".format(python_exe,
+                                                                                                            beamng_home,
+                                                                                                            beamng_user,
+                                                                                                            budget)
     command += commands[tool]
 
     if dave2:
-        command += "--executor dave2 --dave2-model dave2/beamng-dave2-competition-strong.h5 --oob-tolerance 0.1 --speed-limit 25"
+        command += "--executor dave2 --dave2-model dave2/beamng-dave2.h5 --oob-tolerance 0.1 --speed-limit 25"
     else:
         command += "--executor beamng"
 
     p = subprocess.Popen(["powershell.exe", command], stdout=sys.stdout)
     p.communicate()
 
+
 def clear_simulations():
     # This is destructive. Uncomment to remove the simulation files.
-    #path = "simulations/beamng_executor"
-    #if os.path.exists(path):
+    # path = "simulations/beamng_executor"
+    # if os.path.exists(path):
     #    shutil.rmtree(path)
     pass
+
 
 def backup_simulations(sims_before, tool, dave2):
     sims_now = Path("./simulations/beamng_executor").glob("sim_2023*")
@@ -67,6 +74,7 @@ def backup_simulations(sims_before, tool, dave2):
     os.makedirs(tool_sim_dir, exist_ok=True)
     for sim in new_sims:
         shutil.move(str(sim), tool_sim_dir)
+
 
 # Clear simulation files from simulations/. Notice that you need to uncomment lines above.
 clear_simulations()
