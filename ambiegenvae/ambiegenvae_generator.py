@@ -17,6 +17,7 @@ from ambiegenvae.common.save_tc_results import save_tc_results
 from ambiegenvae.generators.latent_generator import LatentGenerator
 from ambiegenvae.common.train_vae import Denormalize1D, VecVAE
 from ambiegenvae.common.test_vae import load_model
+from ambiegenvae.common.termination import BeamNGTermination
 
 from ambiegenvae import ALGORITHMS, SAMPLERS, CROSSOVERS, MUTATIONS
 
@@ -36,9 +37,9 @@ class AmbiegenVAEGenerator:
 
         self.seed = get_random_seed()
         time_budget = self.beamng_executor.time_budget.time_budget
-        self.pop_size = 40
+        self.pop_size = min(int(round(time_budget/180)), 40)
         log.info(f"Population size: {self.pop_size}, time budget: {time_budget}")
-        self.num_gen = int(time_budget / 360) - 5
+        #self.num_gen = int(round(time_budget / 360)) 
         self.alg = "ga"
         self.sampl = "random"  
         self.crossover = "sbx"
@@ -80,7 +81,7 @@ class AmbiegenVAEGenerator:
     def configure_algorithm(self):
         self.method = ALGORITHMS[self.alg](
             pop_size=self.pop_size,
-            n_offsprings=int(self.pop_size / 2),
+            n_offsprings=int(round(self.pop_size / 2)),
             sampling=SAMPLERS[self.sampl](), 
             crossover=CROSSOVERS[self.crossover](prob=0.5, eta=3.0, vtype=float),
             mutation=MUTATIONS[self.mutation](prob=0.4, eta=3.0, vtype=float),
@@ -93,7 +94,7 @@ class AmbiegenVAEGenerator:
         res = minimize(
             self.problem,
             self.method,
-            termination=get_termination("n_gen", self.num_gen),
+            termination= BeamNGTermination(),
             seed=self.seed,
             verbose=False,
             eliminate_duplicates=True,

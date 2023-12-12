@@ -31,21 +31,21 @@ class BeamExecutor(AbstractExecutor):
 
         fitness = 0
 
-        if self.beamng_executor.get_remaining_time()["time-budget"] > 60:
+        #if self.beamng_executor.get_remaining_time()["time-budget"] > 60:
 
-            the_test = RoadTestFactory.create_road_test(test_list)
+        the_test = RoadTestFactory.create_road_test(test_list)
 
-            test_outcome, description, execution_data = self.beamng_executor.execute_test(the_test)
+        test_outcome, description, execution_data = self.beamng_executor.execute_test(the_test)
 
-            log.info(f"Test outcome: {test_outcome}")
+        log.info(f"Test outcome: {test_outcome}")
 
 
-            if test_outcome != "INVALID":
-                fitness = -max([i.oob_percentage for i in execution_data])
+        if test_outcome != "INVALID":
+            fitness = -max([i.oob_percentage for i in execution_data])
 
-            log.info(f"Fitness: {fitness}")
-        else:
-            log.info("Low time budget, skipping test.")
+        log.info(f"Fitness: {fitness}")
+        #else:
+        #    log.info("Low time budget, skipping test.")
         
         
         return fitness
