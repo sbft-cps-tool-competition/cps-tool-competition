@@ -98,7 +98,7 @@ class AmbiegenVAEGenerator:
             seed=self.seed,
             verbose=False,
             eliminate_duplicates=True,
-            save_history=True,
+            save_history=False,
         )
         return res
 
