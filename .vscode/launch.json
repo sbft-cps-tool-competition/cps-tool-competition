@@ -1,0 +1,38 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "rigaa",
+            "type": "python",
+            "request": "launch",
+            "program": "competition.py",
+            "console": "integratedTerminal",
+            "args": [ "--time-budget", "1800",
+                 "--executor", "beamng", "--map-size", "200", 
+                 "--module-name", "rigaa_generator", 
+                 "--class-name", "RIGAATestGenerator", 
+                "--beamng-home", "C:\\DIMA\\BeamNG\\BeamNG.tech.v0.26.2.0",
+                "--beamng-user", "C:\\DIMA\\BeamNG\\BeamNG.tech.v0.26.2.0_user",
+            "--dave2-model", "dave2\\beamng-dave2.h5"
+            ]
+        },
+
+        {
+            "name": "frenetic",
+            "type": "python",
+            "request": "launch",
+            "program": "competition.py",
+            "console": "integratedTerminal",
+            "args": ["--visualize-tests", "--time-budget", "3600",
+                 "--executor", "beamng", "--map-size", "200", 
+                 "--module-name", "src.generators.adaptive_random_frenet_generator", 
+                 "--class-name", "AdaFrenetic", 
+                "--beamng-home", "C:\\Users\\gumen\\Downloads\\BeamNG.tech.v0.24.0.2\\BeamNG.drive-0.24.0.2.13392",
+                "--beamng-user", "C:\\Users\\gumen\\Documents\\BeamNG.tech"]
+        }
+    ]
+}
