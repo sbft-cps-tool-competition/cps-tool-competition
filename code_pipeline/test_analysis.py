@@ -13,6 +13,8 @@ import math
 
 import numpy as np
 
+import matplotlib.pyplot as plt
+
 from shapely.geometry import Point
 from code_pipeline.utils import pairwise
 
@@ -96,10 +98,20 @@ def direction_coverage_klk(the_test, n_bins=36):
     dir_coverage = len(covered_elements) / len(coverage_buckets)
     return "DIR_COV", dir_coverage
 
+# Visualization of direction coverage
+def visualize_dir_cov(coverage_buckets, covered_elements):
+    plt.plot([-1.25,1.25], [0,0], color='black')
+    plt.plot([0,0], [-1.25,1.25], color='black')
+    plt.plot(np.cos(np.radians(coverage_buckets)), np.sin(np.radians(coverage_buckets)), color='black')
+    plt.scatter(np.cos(np.radians(covered_elements)), np.sin(np.radians(covered_elements)), color="green")
+    plt.xlim(-1.25, 1.25)
+    plt.ylim(-1.25, 1.25)
+    plt.gca().set_aspect('equal')
+    plt.show()
 
 # Measure the coverage of road directions w.r.t. to the North (0,1) using the control points of the given road
 # to approximate the road direction. By default we use 36 bins to have bins of 10 deg each
-def direction_coverage(the_test, n_bins=25):
+def direction_coverage(the_test, n_bins=36, debug=False):
     coverage_buckets = np.linspace(0.0, 360.0, num=n_bins + 1)
     direction_list = []
     if not isinstance(the_test, list):
@@ -112,13 +124,14 @@ def direction_coverage(the_test, n_bins=25):
         # E.g. see: https://www.quora.com/What-is-the-angle-between-the-vector-A-2i+3j-and-y-axis
         # https://www.kite.com/python/answers/how-to-get-the-angle-between-two-vectors-in-python
         unit_vector_1 = road_direction / np.linalg.norm(road_direction)
-        dot_product = np.dot(unit_vector_1, THE_NORTH)
-        angle = math.degrees(np.arccos(dot_product))
-        direction_list.append(angle)
+        angle = math.degrees(math.atan2(unit_vector_1[1], unit_vector_1[0]) - math.atan2(THE_NORTH[1], THE_NORTH[0])) % 360
+        direction_list.append(round(angle,3))
 
     # Place observations in bins and get the covered bins without repetition
     covered_elements = set(np.digitize(direction_list, coverage_buckets))
     dir_coverage = len(covered_elements) / len(coverage_buckets)
+    if debug:
+        visualize_dir_cov(coverage_buckets, [round(x*360/n_bins,3) for x in list(covered_elements)])
     return "DIR_COV", dir_coverage
 
 
