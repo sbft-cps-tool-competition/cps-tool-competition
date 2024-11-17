@@ -19,7 +19,7 @@ This simulator is ideal for researchers due to its state-of-the-art soft-body ph
 
 In the competition two lane keeping assist systems are used: BeamnNG.AI provided by the BeamnNG.tech simulator and DAVE-2 trained by the competition organizers (with a `speed-limit` of 25 km/h).
 
-[![Video by BeamNg GmbH](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)](https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif)
+[![Video by BeamNg GmbH](https://user-images.githubusercontent.com/93574498/207164554-3f3d9478-3970-4c08-b1e3-2b656313ae33.webm)]([https://github.com/BeamNG/BeamNGpy/raw/master/media/steering.gif](https://user-images.githubusercontent.com/93574498/207164554-3f3d9478-3970-4c08-b1e3-2b656313ae33.webm))
 
 >Note: BeamNG GmbH, the company developing the simulator, kindly offers it for free for researcher purposes upon registration (see [Installation](documentation/INSTALL.md)).
 
