@@ -1,14 +1,12 @@
 # Cyber-Physical Systems Testing Tool Competition #
 
-The [SBFT Workshop](https://sbft24.github.io/) offers a challenge for software testers who want to work with self-driving cars in the context of the usual [tool competition](https://sbft24.github.io/tools/).
+The [SBFT Workshop](https://sbft25.github.io/) has offered three editions of the self-driving cars testing challenge in the past four years. We provide the link to the respective reports in reversed chronological order:
+- 2024: [DOI](https://doi.org/10.1145/3643659.3643932)
+- 2023: [DOI](https://doi.org/10.1109/SBFT59156.2023.00010)
+- 2022: [DOI](https://doi.org/10.1145/3526072.3527538)
+- 2021: [DOI](https://doi.org/10.1109/SBST52555.2021.00011)
 
-## Important Dates
-
-The deadline to submit your tool is: ~~**November 11th 2023**~~ **December 1st 2023**
-
-The results of the evaluation will be communicated to participants on: **December 21st 2023**
-
-The camera-ready paper describing your tool is due to: **January 25th 2024**
+Below, is an overview of the 2024 edition of the testing challenge.
 
 ## Overview ##
 
@@ -43,10 +41,6 @@ The second metric relies on clustering techniques to measure the diversity of th
 
 We expect that the submitted tools are stochastic in nature, so we compute the coverage as the total coverage over several repetitions of the tool.
 
-## Information About the Competition ##
-
-More information can be found on the SBFT tool competition website: [https://sbft24.github.io/tools/](https://sbft24.github.io/tools/). See also the tool report of the previous competition edition: <https://ieeexplore.ieee.org/document/10190377>
-
 ## Repository Structure ##
 
 [Code pipeline](code_pipeline): code that integrates your test generator with the simulator.
@@ -74,3 +68,83 @@ The software we developed is distributed under GNU GPL license. See the [LICENSE
 Dr. Matteo Biagiola  - Università della Svizzera italiana, Lugano, Switzerland - matteo.biagiola@usi.ch
 
 Dr. Stefan Klikovits - Johannes Kepler University, Linz, Austria - stefan.klikovits@jku.at
+
+## Citing this Project ##
+
+To cite this repository in publications:
+
+```bibtex
+// 2024 edition
+@inproceedings{DBLP:conf/sbst/BiagiolaK24,
+  author       = {Matteo Biagiola and
+                  Stefan Klikovits},
+  title        = {{SBFT} Tool Competition 2024 - Cyber-Physical Systems Track},
+  booktitle    = {Proceedings of the 17th {ACM/IEEE} International Workshop on Search-Based
+                  and Fuzz Testing, {SBFT} 2024, Lisbon, Portugal, 14 April 2024},
+  pages        = {33--36},
+  publisher    = {{ACM}},
+  year         = {2024},
+  url          = {https://doi.org/10.1145/3643659.3643932},
+  doi          = {10.1145/3643659.3643932},
+  timestamp    = {Tue, 22 Oct 2024 21:07:12 +0200},
+  biburl       = {https://dblp.org/rec/conf/sbst/BiagiolaK24.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+// 2023 edition
+@inproceedings{DBLP:conf/icse/BiagiolaKPR23,
+  author       = {Matteo Biagiola and
+                  Stefan Klikovits and
+                  Jarkko Peltom{\"{a}}ki and
+                  Vincenzo Riccio},
+  title        = {{SBFT} Tool Competition 2023 - Cyber-Physical Systems Track},
+  booktitle    = {{IEEE/ACM} International Workshop on Search-Based and Fuzz Testing,
+                  SBFT@ICSE 2023, Melbourne, Australia, May 14, 2023},
+  pages        = {45--48},
+  publisher    = {{IEEE}},
+  year         = {2023},
+  url          = {https://doi.org/10.1109/SBFT59156.2023.00010},
+  doi          = {10.1109/SBFT59156.2023.00010},
+  timestamp    = {Sun, 04 Aug 2024 19:39:38 +0200},
+  biburl       = {https://dblp.org/rec/conf/icse/BiagiolaKPR23.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+// 2022 edition
+@inproceedings{DBLP:conf/sbst/GambiJRZ22,
+  author       = {Alessio Gambi and
+                  Gunel Jahangirova and
+                  Vincenzo Riccio and
+                  Fiorella Zampetti},
+  title        = {{SBST} Tool Competition 2022},
+  booktitle    = {15th {IEEE/ACM} International Workshop on Search-Based Software Testing,
+                  SBST@ICSE 2022, Pittsburgh, PA, USA, May 9, 2022},
+  pages        = {25--32},
+  publisher    = {{IEEE}},
+  year         = {2022},
+  url          = {https://doi.org/10.1145/3526072.3527538},
+  doi          = {10.1145/3526072.3527538},
+  timestamp    = {Tue, 21 Mar 2023 21:02:23 +0100},
+  biburl       = {https://dblp.org/rec/conf/sbst/GambiJRZ22.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+
+// 2021 edition
+@inproceedings{DBLP:conf/sbst/PanichellaGZR21,
+  author       = {Sebastiano Panichella and
+                  Alessio Gambi and
+                  Fiorella Zampetti and
+                  Vincenzo Riccio},
+  title        = {{SBST} Tool Competition 2021},
+  booktitle    = {14th {IEEE/ACM} International Workshop on Search-Based Software Testing,
+                  {SBST} 2021, Madrid, Spain, May 31, 2021},
+  pages        = {20--27},
+  publisher    = {{IEEE}},
+  year         = {2021},
+  url          = {https://doi.org/10.1109/SBST52555.2021.00011},
+  doi          = {10.1109/SBST52555.2021.00011},
+  timestamp    = {Tue, 21 Mar 2023 21:02:23 +0100},
+  biburl       = {https://dblp.org/rec/conf/sbst/PanichellaGZR21.bib},
+  bibsource    = {dblp computer science bibliography, https://dblp.org}
+}
+```
